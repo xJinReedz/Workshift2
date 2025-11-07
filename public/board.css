@@ -6046,3 +6046,47 @@ textarea.card-description:focus {
         min-width: 140px;
     }
 }
+
+/* Delete Label Modal Button Styling */
+#delete-label-modal .modal-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#delete-label-modal .modal-actions .btn {
+    height: 40px;
+    min-height: 40px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+#delete-label-modal .modal-actions .btn-danger {
+    background: #e53e3e;
+    color: white;
+}
+
+#delete-label-modal .modal-actions .btn-danger:hover {
+    background: #c53030;
+}
+
+#delete-label-modal .modal-actions .btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+#delete-label-modal .modal-actions .btn-secondary:hover {
+    background: var(--bg-quaternary);
+}

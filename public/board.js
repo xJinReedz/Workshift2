@@ -1516,12 +1516,9 @@ async function deleteLabel(labelId) {
     // Show the delete confirmation modal
     const modal = document.getElementById('delete-label-modal');
     const titleElement = document.getElementById('deleteLabelTitle');
-    const previewElement = document.getElementById('labelPreviewDelete');
     
-    if (modal && titleElement && previewElement) {
+    if (modal && titleElement) {
         titleElement.textContent = `Delete "${label.name}"?`;
-        previewElement.style.backgroundColor = label.color;
-        previewElement.textContent = label.name;
         
         modal.classList.add('active');
         document.body.classList.add('modal-open');

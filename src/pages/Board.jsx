@@ -683,6 +683,65 @@ const Board = () => {
         </div>
       </div>
 
+      {/* Edit Label Modal */}
+      <div id="edit-label-modal" className="modal edit-label-modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Edit Label</h3>
+            <button className="modal-close" onClick={closeEditLabelModal}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="edit-label-form">
+              <div className="input-with-counter">
+                <input type="text" id="editLabelName" className="form-input" placeholder="Label name..." maxLength="13" />
+                <div className="character-counter" id="editLabelCounter">0/13</div>
+              </div>
+              <div className="color-picker" id="editColorPicker">
+                <div className="color-option" data-color="#61bd4f" style={{background: '#61bd4f'}}></div>
+                <div className="color-option" data-color="#f2d600" style={{background: '#f2d600'}}></div>
+                <div className="color-option" data-color="#ff9f1a" style={{background: '#ff9f1a'}}></div>
+                <div className="color-option" data-color="#eb5a46" style={{background: '#eb5a46'}}></div>
+                <div className="color-option" data-color="#c377e0" style={{background: '#c377e0'}}></div>
+                <div className="color-option" data-color="#0079bf" style={{background: '#0079bf'}}></div>
+                <div className="color-option" data-color="#2ecc71" style={{background: '#2ecc71'}}></div>
+                <div className="color-option" data-color="#e74c3c" style={{background: '#e74c3c'}}></div>
+                <div className="color-option" data-color="#9b59b6" style={{background: '#9b59b6'}}></div>
+                <div className="color-option" data-color="#3498db" style={{background: '#3498db'}}></div>
+              </div>
+              <div className="modal-actions">
+                <button className="btn btn-primary" onClick={saveEditLabel}>Save Changes</button>
+                <button className="btn btn-secondary" onClick={closeEditLabelModal}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Label Confirmation Modal */}
+      <div id="delete-label-modal" className="modal delete-confirmation-modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Delete Label</h3>
+            <button className="modal-close" onClick={closeDeleteLabelModal}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="confirmation-message">
+              <div className="warning-icon">
+                <i className="fas fa-exclamation-triangle"></i>
+              </div>
+              <div className="message-content">
+                <h4 id="deleteLabelTitle">Delete this label?</h4>
+                <p>This will remove the label from all cards. This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button className="btn btn-danger" onClick={confirmDeleteLabel}>Delete Label</button>
+              <button className="btn btn-secondary" onClick={closeDeleteLabelModal}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Add more modals as needed - simplified version but include all important ones */}
       
       {/* Board Statistics Modal */}
