@@ -257,10 +257,19 @@ function renderLists() {
                     </div>
                     <div class="list-body" id="list-${list.id}-cards">
                         ${cardsHTML}
-                        <button class="add-card-btn-inline" data-list-id="${list.id}" data-list-name="${escapeHtml(list.title)}">
-                            <i class="fas fa-plus"></i>
-                            Add a card
-                        </button>
+                        <div class="add-card-section" data-list-id="${list.id}">
+                            <button class="add-card-btn-inline" data-list-id="${list.id}">
+                                <i class="fas fa-plus"></i>
+                                Add a card
+                            </button>
+                            <div class="add-card-form" style="display: none;">
+                                <input type="text" class="add-card-title-input" placeholder="Enter card title..." />
+                                <div class="add-card-actions">
+                                    <button class="btn btn-primary btn-sm add-card-submit">Add Card</button>
+                                    <button class="btn btn-secondary btn-sm add-card-cancel">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -296,6 +305,7 @@ function initializeBoardInteractions() {
     console.log('Initializing board interactions...');
     initializeCardClicks();
     initializeAddCard();
+    initializeAddCardForms();
     initializeListMenus();
     initializeBoardTitleEditing();
     startManilaClock();
@@ -711,7 +721,6 @@ function loadChecklistItemsInline(cardId) {
             <div class="item-checkbox">
                 <input type="checkbox" id="item-inline-${item.id}" ${item.is_completed ? 'checked' : ''} 
                        onchange="toggleChecklistItemInline('${item.id}')">
-                <label for="item-inline-${item.id}"></label>
             </div>
             <div class="item-content ${item.is_completed ? 'completed' : ''}">
                 <span class="item-text">${escapeHtml(item.content)}</span>
@@ -736,7 +745,7 @@ function loadChecklistItemsInline(cardId) {
 
 // Update checklist progress bar
 function updateChecklistProgress(completed, total) {
-    const progressContainer = document.getElementById('checklistProgress');
+    const progressContainer = document.getElementById('checklistProgressContainer');
     const progressText = document.getElementById('progressText');
     const progressBar = document.getElementById('progressBar');
     
@@ -1149,10 +1158,30 @@ function handleAddCardClick(e) {
     e.stopPropagation();
     console.log('Add card button clicked');
     
-    const listId = e.target.getAttribute('data-list-id');
-    if (listId) {
-        console.log('Opening add card modal for list:', listId);
-        openAddCardModal(listId);
+    const button = e.currentTarget;
+    const listId = button.getAttribute('data-list-id');
+    
+    if (!listId) {
+        console.error('No list ID found');
+        return;
+    }
+    
+    // Find the add card section
+    const addCardSection = button.closest('.add-card-section');
+    if (!addCardSection) {
+        console.error('Add card section not found');
+        return;
+    }
+    
+    // Hide the button and show the form
+    button.style.display = 'none';
+    const form = addCardSection.querySelector('.add-card-form');
+    if (form) {
+        form.style.display = 'block';
+        const input = form.querySelector('.add-card-title-input');
+        if (input) {
+            input.focus();
+        }
     }
 }
 
@@ -1257,6 +1286,90 @@ function getNextCardPosition(listId) {
         return cards.length;
     }
     return 0;
+}
+
+// Initialize add card forms (inline)
+function initializeAddCardForms() {
+    // Initialize submit buttons
+    const submitButtons = document.querySelectorAll('.add-card-submit');
+    submitButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('.add-card-form');
+            const section = this.closest('.add-card-section');
+            const listId = section.getAttribute('data-list-id');
+            const input = form.querySelector('.add-card-title-input');
+            
+            if (!input || !listId) return;
+            
+            const title = input.value.trim();
+            if (!title) {
+                showNotification('Please enter a card title', 'error');
+                return;
+            }
+            
+            // Create card
+            const cardData = {
+                title: title,
+                description: '',
+                list_id: parseInt(listId),
+                position: getNextCardPosition(listId)
+            };
+            
+            try {
+                const result = window.db.insert('cards', cardData);
+                
+                if (result) {
+                    showNotification('Card created successfully!', 'success');
+                    
+                    // Reset form
+                    input.value = '';
+                    form.style.display = 'none';
+                    section.querySelector('.add-card-btn-inline').style.display = 'block';
+                    
+                    // Refresh the board
+                    renderLists();
+                }
+            } catch (error) {
+                console.error('Error creating card:', error);
+                showNotification('Failed to create card', 'error');
+            }
+        });
+    });
+    
+    // Initialize cancel buttons
+    const cancelButtons = document.querySelectorAll('.add-card-cancel');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = this.closest('.add-card-form');
+            const section = this.closest('.add-card-section');
+            const input = form.querySelector('.add-card-title-input');
+            
+            // Reset and hide form
+            if (input) input.value = '';
+            form.style.display = 'none';
+            section.querySelector('.add-card-btn-inline').style.display = 'block';
+        });
+    });
+    
+    // Allow Enter key to submit
+    const inputs = document.querySelectorAll('.add-card-title-input');
+    inputs.forEach(input => {
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const form = this.closest('.add-card-form');
+                const submitBtn = form.querySelector('.add-card-submit');
+                if (submitBtn) submitBtn.click();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                const form = this.closest('.add-card-form');
+                const cancelBtn = form.querySelector('.add-card-cancel');
+                if (cancelBtn) cancelBtn.click();
+            }
+        });
+    });
 }
 
 // Labels modal functionality
@@ -2158,6 +2271,22 @@ async function saveChecklistChanges(cardId) {
         };
         
         console.log('Checklist changes saved successfully');
+        
+        // Check if all checklist items are now complete and auto-complete card if needed
+        const allItems = window.db.findBy('checklist_items', { card_id: cardId });
+        if (allItems && allItems.length > 0) {
+            const completedItems = allItems.filter(item => 
+                !!(item.is_completed && item.is_completed !== 0 && item.is_completed !== '0' && item.is_completed !== false)
+            );
+            
+            if (completedItems.length === allItems.length) {
+                // All checklist items are complete, auto-complete the card
+                await autoCompleteCard();
+            } else {
+                // Not all items complete, auto-incomplete the card if it was completed
+                await autoIncompleteCard();
+            }
+        }
     } catch (error) {
         console.error('Error saving checklist changes:', error);
         throw error;
@@ -2995,7 +3124,33 @@ function calculateBoardStatistics() {
     
     const lists = window.db.findBy('lists', { board_id: 1 });
     const allCards = window.db.findBy('cards', {});
-    const allChecklistItems = window.db.findBy('checklist_items', {});
+    let allChecklistItems = window.db.findBy('checklist_items', {});
+    
+    // Apply temporary checklist changes if they exist
+    if (window.tempChecklistChanges) {
+        // Filter out deleted items
+        if (window.tempChecklistChanges.deleted) {
+            allChecklistItems = allChecklistItems.filter(item => 
+                !window.tempChecklistChanges.deleted.includes(item.id)
+            );
+        }
+        
+        // Add temporary items
+        if (window.tempChecklistChanges.added) {
+            allChecklistItems = [...allChecklistItems, ...window.tempChecklistChanges.added];
+        }
+        
+        // Apply toggle changes
+        if (window.tempChecklistChanges.toggled) {
+            allChecklistItems = allChecklistItems.map(item => {
+                const toggledItem = window.tempChecklistChanges.toggled.find(t => t.id === item.id);
+                if (toggledItem) {
+                    return { ...item, is_completed: toggledItem.is_completed };
+                }
+                return item;
+            });
+        }
+    }
     
     let totalCards = 0;
     let completedCards = 0;
@@ -3009,7 +3164,19 @@ function calculateBoardStatistics() {
         
         const cardDetails = listCards.map(card => {
             const cardChecklistItems = allChecklistItems.filter(item => item.card_id === card.id);
-            const cardCompletedItems = cardChecklistItems.filter(item => item.is_completed === 1 || item.is_completed === true);
+            // Check if is_completed is truthy (1, true, "1", etc.) but not falsy (0, false, "0", "", null, undefined)
+            const cardCompletedItems = cardChecklistItems.filter(item => {
+                const val = item.is_completed;
+                // Check if it's truthy and not explicitly false/0/"0"
+                return val === 1 || val === true || val === "1" || val === '1';
+            });
+            
+            console.log('Card:', card.title);
+            console.log('Total checklist items:', cardChecklistItems.length);
+            console.log('Completed items:', cardCompletedItems.length);
+            if (cardChecklistItems.length > 0) {
+                console.log('Sample item:', JSON.stringify(cardChecklistItems[0]));
+            }
             
             totalChecklistItems += cardChecklistItems.length;
             completedChecklistItems += cardCompletedItems.length;
@@ -3050,13 +3217,21 @@ function calculateBoardStatistics() {
         };
     });
     
-    const cardCompletionRate = totalCards > 0 ? Math.round((cardsWithFullChecklists / totalCards) * 100) : 0;
+    // Card completion rate based on cards marked as completed, not checklist completion
+    const cardCompletionRate = totalCards > 0 ? Math.round((completedCards / totalCards) * 100) : 0;
     const overallChecklistProgress = totalChecklistItems > 0 ? Math.round((completedChecklistItems / totalChecklistItems) * 100) : 0;
+    
+    console.log('=== STATISTICS CALCULATION ===');
+    console.log('Total checklist items:', totalChecklistItems);
+    console.log('Completed checklist items:', completedChecklistItems);
+    console.log('Overall checklist progress:', overallChecklistProgress + '%');
+    console.log('==============================');
     
     return {
         cardCompletionRate,
         completedCards,
         totalCards,
+        cardsWithFullChecklists,
         overallChecklistProgress,
         completedChecklistItems,
         totalChecklistItems,
@@ -3068,12 +3243,35 @@ function calculateBoardStatistics() {
 function updateStatisticsModal(stats) {
     if (!stats) return;
     
+    console.log('Updating statistics modal with:', stats);
+    
     // Update overview cards
     document.getElementById('cardCompletionRate').textContent = `${stats.cardCompletionRate}%`;
+    const cardCompletionDesc = document.getElementById('completedCardsDesc');
+    if (cardCompletionDesc) {
+        cardCompletionDesc.textContent = `Cards with 100% checklists done`;
+    }
+    
     document.getElementById('completedCards').textContent = stats.completedCards;
     document.getElementById('completedCardsDesc').textContent = `Out of ${stats.totalCards} total cards`;
-    document.getElementById('checklistProgress').textContent = `${stats.overallChecklistProgress}%`;
-    document.getElementById('checklistProgressDesc').textContent = `${stats.completedChecklistItems}/${stats.totalChecklistItems} individual checklists`;
+    
+    const checklistProgressElement = document.getElementById('checklistProgress');
+    const checklistProgressDescElement = document.getElementById('checklistProgressDesc');
+    
+    console.log('Setting checklistProgress to:', `${stats.overallChecklistProgress}%`);
+    console.log('checklistProgress element:', checklistProgressElement);
+    
+    if (checklistProgressElement) {
+        checklistProgressElement.textContent = `${stats.overallChecklistProgress}%`;
+    } else {
+        console.error('checklistProgress element not found!');
+    }
+    
+    if (checklistProgressDescElement) {
+        checklistProgressDescElement.textContent = `${stats.completedChecklistItems}/${stats.totalChecklistItems} individual checklists`;
+    } else {
+        console.error('checklistProgressDesc element not found!');
+    }
     
     // Update detailed progress by list
     const container = document.getElementById('listProgressContainer');

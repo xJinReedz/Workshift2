@@ -36,6 +36,9 @@ const Board = () => {
           initializePage();
         }
       }, 100);
+      
+      // Cleanup interval on unmount
+      return () => clearInterval(checkReady);
     }
   }, [navigate, boardId]);
 
@@ -480,7 +483,7 @@ const Board = () => {
                     <h3>Description</h3>
                   </div>
                   <div className="section-content">
-                    <textarea className="card-description" id="cardDescription" placeholder="This section must articulate the specific, pressing issue, challenge, or gap in knowledge that your project is designed to resolve."></textarea>
+                    <textarea className="card-description" id="cardDescription"></textarea>
                   </div>
                 </div>
 
@@ -530,7 +533,7 @@ const Board = () => {
                   <div className="section-header">
                     <i className="fas fa-check-square"></i>
                     <h3>Checklist</h3>
-                    <div className="checklist-progress" id="checklistProgress" style={{display: 'none'}}>
+                    <div className="checklist-progress" id="checklistProgressContainer" style={{display: 'none'}}>
                       <span className="progress-text" id="progressText">0/0</span>
                       <div className="progress-bar-container">
                         <div className="progress-bar" id="progressBar" style={{width: '0%'}}></div>
