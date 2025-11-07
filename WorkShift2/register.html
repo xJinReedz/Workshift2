@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkShift - Create Account</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <div class="auth-logo-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="auth-logo-text">WorkShift</div>
+                </div>
+                <h1 class="auth-title">Create your account</h1>
+                <p class="auth-subtitle">Start managing your projects today</p>
+            </div>
+
+            <!-- Error Message -->
+            <div class="auth-error" id="auth-error">
+                <i class="fas fa-exclamation-triangle auth-error-icon"></i>
+                <span id="error-message"></span>
+            </div>
+
+            <!-- Success Message -->
+            <div class="auth-success" id="auth-success">
+                <i class="fas fa-check-circle auth-success-icon"></i>
+                <span id="success-message"></span>
+            </div>
+
+            <form class="auth-form" id="register-form">
+                <div class="name-fields-container">
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="firstName">First Name</label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            class="auth-form-input" 
+                            placeholder="First name"
+                            required
+                            autocomplete="given-name"
+                        >
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label class="auth-form-label" for="lastName">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            class="auth-form-input" 
+                            placeholder="Last name"
+                            required
+                            autocomplete="family-name"
+                        >
+                    </div>
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="auth-form-input" 
+                        placeholder="Enter your email address"
+                        required
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="password">Password</label>
+                    <div class="password-input-container">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="auth-form-input password-input" 
+                            placeholder="Create a strong password"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">
+                            <i class="fas fa-eye" id="password-toggle-icon"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength" id="password-strength">
+                        <div class="password-strength-bar">
+                            <div class="password-strength-fill" id="strength-fill"></div>
+                        </div>
+                        <div class="password-strength-text" id="strength-text">
+                            Password strength: <span id="strength-level">Enter a password</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="auth-form-group">
+                    <label class="auth-form-label" for="confirmPassword">Confirm Password</label>
+                    <div class="password-input-container">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            class="auth-form-input password-input" 
+                            placeholder="Confirm your password"
+                            required
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="password-toggle" id="confirm-password-toggle" aria-label="Show password">
+                            <i class="fas fa-eye" id="confirm-password-toggle-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="auth-form-checkbox">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">
+                        I agree to the <a href="#" target="_blank">Terms of Service</a> and 
+                        <a href="#" target="_blank">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div class="auth-form-checkbox">
+                    <input type="checkbox" id="newsletter" name="newsletter">
+                    <label for="newsletter">
+                        Send me product updates and tips via email
+                    </label>
+                </div>
+
+                <button type="submit" class="auth-submit-btn" id="register-btn">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="auth-divider">
+                <span>or continue with</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-login-btn google" onclick="handleSocialLogin('google')">
+                    <i class="fab fa-google social-login-icon"></i>
+                    Continue with Google
+                </button>
+                <button class="social-login-btn microsoft" onclick="handleSocialLogin('microsoft')">
+                    <i class="fab fa-microsoft social-login-icon"></i>
+                    Continue with Microsoft
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                <p class="auth-footer-text">Already have an account?</p>
+                <a href="login.html" class="auth-footer-link">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Initialize register page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Redirect if already authenticated
+            if (window.api.isAuthenticated()) {
+                window.location.href = 'index.html';
+                return;
+            }
+            initializeRegisterForm();
+        });
+    </script>
+</body>
+</html>

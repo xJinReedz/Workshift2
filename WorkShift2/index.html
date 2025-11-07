@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkShift - Dashboard</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="index.html" class="navbar-brand">
+                    <i class="fas fa-tasks"></i> WorkShift
+                </a>
+                
+                <ul class="navbar-nav">
+                    <li><a href="index.html" class="active">Boards</a></li>
+                    <li><a href="calendar.html">Calendar</a></li>
+                    <li><a href="inbox.html">Inbox</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                </ul>
+                
+                <div class="navbar-actions">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search boards, cards, and more...">
+                    </div>
+                    
+                    <button class="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <div class="profile-avatar" onclick="openProfileModal()">
+                            LT
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Left sidebar removed (top navigation provides primary navigation) -->
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard-layout">
+            <div class="dashboard-main">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <h1 class="dashboard-title">Your Boards</h1>
+                    <p class="dashboard-subtitle">Manage your projects and collaborate with your team</p>
+                </div>
+
+                <!-- Boards Grid -->
+                <div class="boards-grid" id="boards-grid">
+                    <!-- Create New Board Tile -->
+                    <div class="board-tile create-new" onclick="openModal('create-board-modal')">
+                        <div class="create-new-content">
+                            <i class="fas fa-plus create-new-icon"></i>
+                            <div class="create-new-text">Create New Board</div>
+                        </div>
+                    </div>
+
+                    <!-- Boards will be loaded dynamically from database -->
+                </div>
+            </div>
+
+            <!-- Dashboard Sidebar -->
+            <div class="dashboard-sidebar">
+                <!-- Starred Boards -->
+                <div class="starred-boards">
+                    <h3><i class="fas fa-star"></i> Starred Boards</h3>
+                    <ul class="starred-list" id="starred-boards-list">
+                        <!-- Starred boards will be loaded dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <h3>Recent Activity</h3>
+                    <ul class="activity-list">
+                        <li class="activity-item" onclick="window.location.href='index.html'">
+                            <div class="activity-avatar">
+                                <div class="avatar avatar-sm" style="background: #61bd4f;">PR</div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Paolo Rayos</strong> added a card to 
+                                    <span class="activity-board">Mobile App Development</span>
+                                </div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item" onclick="window.location.href='index.html'">
+                            <div class="activity-avatar">
+                                <div class="avatar avatar-sm" style="background: #0079bf;">LT</div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Luc Trevecedo</strong> completed a task in 
+                                    <span class="activity-board">Website Redesign</span>
+                                </div>
+                                <div class="activity-time">4 hours ago</div>
+                            </div>
+                        </li>
+                        <li class="activity-item" onclick="window.location.href='index.html'">
+                            <div class="activity-avatar">
+                                <div class="avatar avatar-sm" style="background: #eb5a46;">NA</div>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-text">
+                                    <strong>Nathaniel Andrada</strong> commented on a card in 
+                                    <span class="activity-board">Marketing Campaign Q1</span>
+                                </div>
+                                <div class="activity-time">1 day ago</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Board Modal -->
+    <div id="create-board-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Board</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-board-form">
+                    <div class="form-group">
+                        <label class="form-label">Board Title</label>
+                        <input type="text" class="form-input" placeholder="Enter board title..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description (Optional)</label>
+                        <textarea class="form-input" rows="3" placeholder="What's this board about?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Background</label>
+                        <div class="background-options" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <div class="bg-option" style="width: 60px; height: 40px; border-radius: 4px; cursor: pointer; background: linear-gradient(135deg, #0079bf, #00c2e0);"></div>
+                            <div class="bg-option" style="width: 60px; height: 40px; border-radius: 4px; cursor: pointer; background: linear-gradient(135deg, #61bd4f, #51e5ff);"></div>
+                            <div class="bg-option" style="width: 60px; height: 40px; border-radius: 4px; cursor: pointer; background: linear-gradient(135deg, #f2d600, #ff9f1a);"></div>
+                            <div class="bg-option" style="width: 60px; height: 40px; border-radius: 4px; cursor: pointer; background: linear-gradient(135deg, #eb5a46, #ff6b6b);"></div>
+                            <div class="bg-option" style="width: 60px; height: 40px; border-radius: 4px; cursor: pointer; background: linear-gradient(135deg, #c377e0, #f093fb);"></div>
+                            <div class="bg-option" style="width: 60px; height: 40px; border-radius: 4px; cursor: pointer; background: linear-gradient(135deg, #ff9f1a, #feca57);"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal(document.getElementById('create-board-modal'))">Cancel</button>
+                <button type="submit" class="btn btn-primary" form="create-board-form">Create Board</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div id="template-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Choose Template</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Start with a template to get your board set up quickly.</p>
+                <div class="template-grid" style="display: grid; gap: 1rem;">
+                    <div class="template-item">
+                        <div class="template-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <div class="template-info">
+                            <div class="template-name">Project Management</div>
+                            <div class="template-description">Manage projects from start to finish with customizable workflows</div>
+                        </div>
+                    </div>
+                    <div class="template-item">
+                        <div class="template-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="template-info">
+                            <div class="template-name">Marketing Campaign</div>
+                            <div class="template-description">Plan and track marketing initiatives and campaigns</div>
+                        </div>
+                    </div>
+                    <div class="template-item">
+                        <div class="template-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="template-info">
+                            <div class="template-name">Software Development</div>
+                            <div class="template-description">Agile development workflow with sprints and backlogs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal(document.getElementById('template-modal'))">Cancel</button>
+                <button type="button" class="btn btn-primary">Use Template</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Board Confirmation Modal -->
+    <div id="delete-board-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle" style="color: var(--danger-color);"></i> Delete Board</h3>
+                <button class="modal-close" onclick="closeModal(document.getElementById('delete-board-modal'))">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the board <strong id="board-name-to-delete"></strong>?</p>
+                <p style="color: var(--danger-color); font-size: 0.875rem; margin-top: 1rem;">
+                    <i class="fas fa-info-circle"></i> This action cannot be undone. All lists and cards in this board will be permanently deleted.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal(document.getElementById('delete-board-modal'))">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-board" onclick="deleteBoard()">
+                    <i class="fas fa-trash"></i> Delete Board
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Dropdown -->
+    <div id="profile-menu" class="dropdown-menu" style="position: absolute; top: 100%; right: 0; background: white; border: 1px solid var(--border-color); border-radius: var(--border-radius); box-shadow: var(--shadow-md); min-width: 200px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: var(--transition);">
+        <div style="padding: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+                <div class="avatar">LT</div>
+                <div>
+                    <div style="font-weight: 600;">Luc Trevecedo</div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary);">luc@gmail.com</div>
+                </div>
+            </div>
+            <ul style="list-style: none;">
+                <li><a href="#" style="display: block; padding: 0.5rem 0; color: var(--text-primary); transition: var(--transition);">Profile</a></li>
+                <li><a href="#" style="display: block; padding: 0.5rem 0; color: var(--text-primary); transition: var(--transition);">Settings</a></li>
+                <li><a href="#" style="display: block; padding: 0.5rem 0; color: var(--text-primary); transition: var(--transition);">Help</a></li>
+                <li style="border-top: 1px solid var(--border-color); margin-top: 0.5rem; padding-top: 0.5rem;">
+                    <a href="#" onclick="handleLogout()" style="display: block; padding: 0.5rem 0; color: var(--danger-color); transition: var(--transition);">Sign Out</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.api.isAuthenticated()) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

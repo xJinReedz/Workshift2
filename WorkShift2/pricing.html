@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkShift - Pricing</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/pricing.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="index.html" class="navbar-brand">
+                    <i class="fas fa-tasks"></i> WorkShift
+                </a>
+                
+                <ul class="navbar-nav">
+                    <li><a href="index.html">Boards</a></li>
+                    <li><a href="calendar.html">Calendar</a></li>
+                    <li><a href="inbox.html">Inbox</a></li>
+                    <li><a href="pricing.html" class="active">Pricing</a></li>
+                </ul>
+                
+                <div class="navbar-actions">
+                    <button class="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <div class="profile-avatar" onclick="openProfileModal()">LT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Left sidebar removed (top navigation provides primary navigation) -->
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="pricing-container">
+            <!-- Pricing Header -->
+            <div class="pricing-header">
+                <h1 class="pricing-title">Choose the perfect plan for your team</h1>
+                <p class="pricing-subtitle">
+                    Start with our free plan and upgrade as your team grows. All plans include our core features 
+                    with different limits and advanced capabilities.
+                </p>
+                
+                <!-- Billing Toggle -->
+                <div class="pricing-toggle">
+                    <span class="pricing-toggle-label active" id="monthly-label">Monthly</span>
+                    <div class="pricing-switch" id="billing-toggle" onclick="toggleBilling()"></div>
+                    <span class="pricing-toggle-label" id="yearly-label">
+                        Yearly
+                        <span class="pricing-discount">Save 20%</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Pricing Cards -->
+            <div class="pricing-cards">
+                <!-- Basic Plan -->
+                <div class="pricing-card" data-plan="basic">
+                    <div class="pricing-card-header">
+                        <div class="pricing-card-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3 class="pricing-card-name">Basic</h3>
+                        <p class="pricing-card-description">Allows up to three boards with unlimited cards and lists, basic collaboration for two collaborators per board, and file uploads up to 10 MB.</p>
+                    </div>
+                    
+                    <div class="pricing-card-price">
+                        <div class="pricing-price">
+                            <span class="pricing-currency">₱</span>
+                            <span class="pricing-amount" id="basic-price">0</span>
+                            <span class="pricing-period">/month</span>
+                        </div>
+                        <div class="pricing-billing" id="basic-billing">Free forever</div>
+                    </div>
+                    
+                    <div class="pricing-card-features">
+                        <ul class="pricing-features-list">
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Up to 3 boards</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Unlimited cards and lists</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">2 collaborators per board</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">File uploads up to 10 MB</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Basic collaboration</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pricing-card-cta">
+                        <button class="pricing-cta-btn current">Current Plan</button>
+                        <p class="pricing-cta-note">You're currently on the Basic plan</p>
+                    </div>
+                </div>
+
+                <!-- Pro Plan (Featured) -->
+                <div class="pricing-card featured" data-plan="pro">
+                    <div class="pricing-card-header">
+                        <div class="pricing-card-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3 class="pricing-card-name">Pro</h3>
+                        <p class="pricing-card-description">Unlimited boards, advanced collaboration tools, larger file uploads, customizations, reminders, calendar view, and app integrations for small to medium teams.</p>
+                    </div>
+                    
+                    <div class="pricing-card-price">
+                        <div class="pricing-price">
+                            <span class="pricing-original" id="pro-original" style="display: none;">₱98</span>
+                            <span class="pricing-currency">₱</span>
+                            <span class="pricing-amount" id="pro-price">78</span>
+                            <span class="pricing-period">/month</span>
+                        </div>
+                        <div class="pricing-billing" id="pro-billing">per user, billed monthly</div>
+                    </div>
+                    
+                    <div class="pricing-card-features">
+                        <ul class="pricing-features-list">
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Unlimited boards</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Advanced collaboration tools</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Larger file uploads</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Customizations</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Reminders</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Calendar view</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">App integrations</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pricing-card-cta">
+                        <button class="pricing-cta-btn primary" onclick="selectPlan('pro')">Upgrade to Pro</button>
+                        <p class="pricing-cta-note">14-day free trial, no credit card required</p>
+                    </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card" data-plan="enterprise">
+                    <div class="pricing-card-header">
+                        <div class="pricing-card-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h3 class="pricing-card-name">Enterprise</h3>
+                        <p class="pricing-card-description">Organization-wide management with advanced permissions, custom security policies, centralized billing, and dedicated onboarding to streamline productivity across all departments.</p>
+                    </div>
+                    
+                    <div class="pricing-card-price">
+                        <div class="pricing-price">
+                            <span class="pricing-original" id="enterprise-original" style="display: none;">₱1639</span>
+                            <span class="pricing-currency">₱</span>
+                            <span class="pricing-amount" id="enterprise-price">1359</span>
+                            <span class="pricing-period">/month</span>
+                        </div>
+                        <div class="pricing-billing" id="enterprise-billing">per user, billed monthly</div>
+                    </div>
+                    
+                    <div class="pricing-card-features">
+                        <ul class="pricing-features-list">
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Everything in Pro</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Organization-wide management</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Advanced permissions</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Custom security policies</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Centralized billing</span>
+                            </li>
+                            <li class="pricing-feature included">
+                                <div class="pricing-feature-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span class="pricing-feature-text">Dedicated onboarding</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="pricing-card-cta">
+                        <button class="pricing-cta-btn secondary" onclick="selectPlan('enterprise')">Upgrade to Enterprise</button>
+                        <p class="pricing-cta-note">14-day free trial, no credit card required</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enterprise Contact Section -->
+            <div class="enterprise-contact">
+                <h3 class="enterprise-title">Need something more?</h3>
+                <p class="enterprise-description">
+                    Looking for custom features, on-premise deployment, or have a large team? 
+                    Our enterprise solutions are designed to meet your specific needs.
+                </p>
+                <div class="enterprise-cta">
+                    <a href="#" class="enterprise-btn secondary" onclick="scheduleDemo()">
+                        <i class="fas fa-calendar"></i>
+                        Schedule Demo
+                    </a>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="pricing-faq">
+                <h2 class="faq-title">Frequently Asked Questions</h2>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Can I change my plan at any time?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="faq-answer-text">
+                                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, 
+                                and we'll prorate any billing adjustments on your next invoice.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>Is there a free trial available?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="faq-answer-text">
+                                Yes! We offer a 14-day free trial for both Pro and Enterprise plans. No credit card required. 
+                                You can start your trial at any time and explore all the features.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>What payment methods do you accept?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="faq-answer-text">
+                                We accept all major credit cards (Visa, MasterCard, American Express), PayPal, 
+                                and bank transfers for Enterprise customers. All payments are processed securely.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <button class="faq-question" onclick="toggleFaq(this)">
+                            <span>What kind of support do you provide?</span>
+                            <i class="fas fa-chevron-down faq-question-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="faq-answer-text">
+                                Support varies by plan: Basic users get email support, Pro users get priority email support, 
+                                and Enterprise users get 24/7 phone support plus a dedicated account manager.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal" style="display: none;">
+        <div class="modal-container payment-modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Upgrade to Pro</h3>
+                <button class="modal-close" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Plan Summary -->
+                <div class="plan-summary">
+                    <div class="plan-info">
+                        <h4 id="selectedPlan">Pro Plan</h4>
+                        <div class="plan-price">
+                            <span class="price-amount" id="selectedPrice">₱78</span>
+                            <span class="price-period">/month per user</span>
+                        </div>
+                    </div>
+                    <div class="plan-features">
+                        <p class="trial-info">
+                            <i class="fas fa-gift"></i>
+                            14-day free trial, then ₱<span id="monthlyPrice">78</span>/month
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Payment Form -->
+                <form class="payment-form" id="paymentForm" onsubmit="processPayment(event)">
+                    <!-- Payment Method -->
+                    <div class="payment-methods">
+                        <h4>Payment Method</h4>
+                        <div class="payment-options">
+                            <label class="payment-option active">
+                                <input type="radio" name="paymentMethod" value="card" checked>
+                                <div class="payment-option-content">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Credit/Debit Card</span>
+                                </div>
+                            </label>
+                            <label class="payment-option">
+                                <input type="radio" name="paymentMethod" value="paypal">
+                                <div class="payment-option-content">
+                                    <i class="fab fa-paypal"></i>
+                                    <span>PayPal</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Card Details -->
+                    <div class="card-details" id="cardDetails">
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number</label>
+                            <div class="card-input-container">
+                                <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" 
+                                       maxlength="19" oninput="formatCardNumber(this)">
+                                <div class="card-icons">
+                                    <i class="fab fa-cc-visa"></i>
+                                    <i class="fab fa-cc-mastercard"></i>
+                                    <i class="fab fa-cc-amex"></i>
+                                </div>
+                            </div>
+                            <span class="error-message" id="cardNumberError"></span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expiryDate">Expiry Date</label>
+                                <input type="text" id="expiryDate" name="expiryDate" placeholder="MM/YY" 
+                                       maxlength="5" oninput="formatExpiryDate(this)">
+                                <span class="error-message" id="expiryError"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" name="cvv" placeholder="123" 
+                                       maxlength="4" oninput="formatCVV(this)">
+                                <span class="error-message" id="cvvError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cardName">Cardholder Name</label>
+                            <input type="text" id="cardName" name="cardName" placeholder="John Doe">
+                            <span class="error-message" id="cardNameError"></span>
+                        </div>
+                    </div>
+
+                    <!-- Billing Information -->
+                    <div class="billing-info">
+                        <h4>Billing Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" name="firstName">
+                                <span class="error-message" id="firstNameError"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" name="lastName">
+                                <span class="error-message" id="lastNameError"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email">
+                            <span class="error-message" id="emailError"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="country">Country</label>
+                            <select id="country" name="country">
+                                <option value="">Select Country</option>
+                                <option value="PH" selected>Philippines</option>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                            </select>
+                            <span class="error-message" id="countryError"></span>
+                        </div>
+                    </div>
+
+                    <!-- Terms -->
+                    <div class="terms-section">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms">
+                            <span class="checkmark"></span>
+                            <span class="checkbox-text">
+                                I agree to the <a href="#" class="terms-link">Terms of Service</a> and 
+                                <a href="#" class="terms-link">Privacy Policy</a>
+                            </span>
+                        </label>
+                        <span class="error-message" id="termsError"></span>
+                    </div>
+
+                    <!-- Security Notice -->
+                    <div class="security-notice">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Your payment information is secure and encrypted</span>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closePaymentModal()">Cancel</button>
+                <button type="submit" form="paymentForm" class="btn-primary" id="submitPayment">
+                    <span class="btn-text">Start Free Trial</span>
+                    <span class="btn-loader" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Processing...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/pricing.js"></script>
+    <script>
+        // Check authentication on page load  
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.api.isAuthenticated()) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkShift - Inbox</title>
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/inbox.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a href="index.html" class="navbar-brand">
+                    <i class="fas fa-tasks"></i> WorkShift
+                </a>
+                
+                <ul class="navbar-nav">
+                    <li><a href="index.html">Boards</a></li>
+                    <li><a href="calendar.html">Calendar</a></li>
+                    <li><a href="inbox.html" class="active">Inbox</a></li>
+                    <li><a href="pricing.html">Pricing</a></li>
+                </ul>
+                
+                <div class="navbar-actions">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Search notifications...">
+                    </div>
+                    
+                    <button class="mobile-menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <div class="profile-avatar" onclick="openProfileModal()">LT</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Left sidebar removed (top navigation provides primary navigation) -->
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="inbox-container">
+            <!-- Inbox Header -->
+            <div class="inbox-header">
+                <h1 class="inbox-title">
+                    <i class="fas fa-inbox"></i>
+                    Inbox
+                    <span class="inbox-badge" id="unread-count">4</span>
+                </h1>
+                
+                <div class="inbox-actions">
+                    <div class="inbox-filter">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="unread">Unread</button>
+                        <button class="filter-btn" data-filter="mentions">Mentions</button>
+                    </div>
+                    
+                    <span class="mark-all-read" onclick="markAllAsRead()">Mark all as read</span>
+                </div>
+            </div>
+
+            <!-- Inbox Layout -->
+            <div class="inbox-layout">
+                <div class="inbox-main">
+                    <!-- Notification List -->
+                    <div class="notification-list" id="notification-list">
+                        <!-- Unread Notifications -->
+                        <div class="notification-item unread" data-type="mention" data-id="1">
+                            <div class="notification-avatar">
+                                <div class="avatar" style="background: #61bd4f;">PR</div>
+                                <div class="notification-type-icon mention">
+                                    <i class="fas fa-at"></i>
+                                </div>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h4 class="notification-title">Paolo Rayos mentioned you</h4>
+                                    <span class="notification-time">2 hours ago</span>
+                                </div>
+                                <p class="notification-message">
+                                    <strong>@luc</strong> can you review the homepage mockups when you have a chance? I'd love to get your feedback on the new layout.
+                                </p>
+                                <div class="notification-context">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>in card "Homepage mockups" on</span>
+                                    <span class="notification-board">Website Redesign</span>
+                                </div>
+                                <div class="notification-actions">
+                                    <button class="notification-action primary">Reply</button>
+                                    <button class="notification-action">View Card</button>
+                                    <button class="notification-action">Mark as Read</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="notification-item unread" data-type="due-date" data-id="3">
+                            <div class="notification-avatar">
+                                <div class="avatar" style="background: #eb5a46;">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="notification-type-icon due-date">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h4 class="notification-title">Card due soon</h4>
+                                    <span class="notification-time">4 hours ago</span>
+                                </div>
+                                <p class="notification-message">
+                                    "Design system components" is due in 2 days (January 20, 2024). Make sure to complete all remaining tasks.
+                                </p>
+                                <div class="notification-context">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>in card "Design system components" on</span>
+                                    <span class="notification-board">Website Redesign</span>
+                                </div>
+                                <div class="notification-actions">
+                                    <button class="notification-action primary">Reply</button>
+                                    <button class="notification-action">View Card</button>
+                                    <button class="notification-action">Mark as Read</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="notification-item unread" data-type="comment" data-id="4">
+                            <div class="notification-avatar">
+                                <div class="avatar" style="background: #f2d600; color: #333;">ES</div>
+                                <div class="notification-type-icon comment">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h4 class="notification-title">New comment on your card</h4>
+                                    <span class="notification-time">6 hours ago</span>
+                                </div>
+                                <p class="notification-message">
+                                    Elijah Sintor commented: "The wireframes look great! I have a few suggestions for the navigation layout. Can we schedule a quick call to discuss?"
+                                </p>
+                                <div class="notification-context">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>in card "Create wireframes for homepage" on</span>
+                                    <span class="notification-board">Website Redesign</span>
+                                </div>
+                                <div class="notification-actions">
+                                    <button class="notification-action primary">Reply</button>
+                                    <button class="notification-action">View Card</button>
+                                    <button class="notification-action">Mark as Read</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="notification-item unread" data-type="board-update" data-id="5">
+                            <div class="notification-avatar">
+                                <div class="avatar" style="background: #c377e0;">AL</div>
+                                <div class="notification-type-icon board-update">
+                                    <i class="fas fa-plus"></i>
+                                </div>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-header">
+                                    <h4 class="notification-title">New card added to board</h4>
+                                    <span class="notification-time">8 hours ago</span>
+                                </div>
+                                <p class="notification-message">
+                                    Andrew Llego added "Set up CI/CD pipeline" to the "In Progress" list. This card has been assigned to the development team.
+                                </p>
+                                <div class="notification-context">
+                                    <i class="fas fa-th-large"></i>
+                                    <span>on board</span>
+                                    <span class="notification-board">Mobile App Development</span>
+                                </div>
+                                <div class="notification-actions">
+                                    <button class="notification-action primary">Reply</button>
+                                    <button class="notification-action">View Card</button>
+                                    <button class="notification-action">Mark as Read</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Empty State (hidden by default) -->
+                    <div class="inbox-empty" id="inbox-empty" style="display: none;">
+                        <div class="inbox-empty-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <h3 class="inbox-empty-title">All caught up!</h3>
+                        <p class="inbox-empty-message">
+                            You have no new notifications.<br>
+                            We'll notify you when there's something new to see.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Inbox Sidebar -->
+                <div class="inbox-sidebar">
+                    <!-- Quick Stats -->
+                    <div class="sidebar-section">
+                        <h3>Quick Stats</h3>
+                        <div class="quick-stats">
+                            <div class="stat-item" onclick="filterNotifications('unread')">
+                                <div class="stat-label">
+                                    <i class="fas fa-envelope stat-icon"></i>
+                                    <span>Unread</span>
+                                </div>
+                                <div class="stat-value highlight">4</div>
+                            </div>
+                            <div class="stat-item" onclick="filterNotifications('mentions')">
+                                <div class="stat-label">
+                                    <i class="fas fa-at stat-icon"></i>
+                                    <span>Mentions</span>
+                                </div>
+                                <div class="stat-value">2</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-label">
+                                    <i class="fas fa-clock stat-icon"></i>
+                                    <span>Due Soon</span>
+                                </div>
+                                <div class="stat-value highlight">3</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="sidebar-section">
+                        <h3>Recent Activity</h3>
+                        <div class="recent-activity-list">
+                            <div class="activity-item-small">
+                                <div class="avatar avatar-sm" style="background: #61bd4f;">PR</div>
+                                <div class="activity-content-small">
+                                    <div class="activity-text-small">Completed "User research analysis"</div>
+                                    <div class="activity-time-small">30 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item-small">
+                                <div class="avatar avatar-sm" style="background: #c377e0;">AL</div>
+                                <div class="activity-content-small">
+                                    <div class="activity-text-small">Added comment to "API integration"</div>
+                                    <div class="activity-time-small">1 hour ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item-small">
+                                <div class="avatar avatar-sm" style="background: #f2d600; color: #333;">ES</div>
+                                <div class="activity-content-small">
+                                    <div class="activity-text-small">Moved card to "Review"</div>
+                                    <div class="activity-time-small">2 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item-small">
+                                <div class="avatar avatar-sm" style="background: #c377e0;">TC</div>
+                                <div class="activity-content-small">
+                                    <div class="activity-text-small">Created new board "Q2 Planning"</div>
+                                    <div class="activity-time-small">3 hours ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notification Settings -->
+                    <div class="sidebar-section">
+                        <h3>Notification Settings</h3>
+                        <div class="notification-settings">
+                            <div class="setting-item">
+                                <span class="setting-label">Email notifications</span>
+                                <div class="setting-toggle active" onclick="toggleSetting(this)"></div>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Push notifications</span>
+                                <div class="setting-toggle active" onclick="toggleSetting(this)"></div>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Mentions only</span>
+                                <div class="setting-toggle" onclick="toggleSetting(this)"></div>
+                            </div>
+                            <div class="setting-item">
+                                <span class="setting-label">Due date reminders</span>
+                                <div class="setting-toggle active" onclick="toggleSetting(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/database.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/inbox.js"></script>
+    <script>
+        // Check authentication on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!window.api.isAuthenticated()) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -4,40 +4,69 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0079bf" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="WorkShift - Project Management and Team Collaboration Tool"
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Original WorkShift CSS files -->
+    <link rel="stylesheet" href="%PUBLIC_URL%/shared.css">
+    <link rel="stylesheet" href="%PUBLIC_URL%/auth.css">
+    <link rel="stylesheet" href="%PUBLIC_URL%/dashboard.css">
+    <link rel="stylesheet" href="%PUBLIC_URL%/board.css">
+    <link rel="stylesheet" href="%PUBLIC_URL%/calendar.css">
+    <link rel="stylesheet" href="%PUBLIC_URL%/inbox.css">
+    <link rel="stylesheet" href="%PUBLIC_URL%/pricing.css">
+    
+    <title>WorkShift - Project Management</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
-
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    
+    <!-- Original WorkShift JavaScript files -->
+    <script src="%PUBLIC_URL%/database.js"></script>
+    <script src="%PUBLIC_URL%/api.js"></script>
+    <script src="%PUBLIC_URL%/shared.js"></script>
+    <script src="%PUBLIC_URL%/auth.js"></script>
+    <script src="%PUBLIC_URL%/dashboard.js"></script>
+    <script src="%PUBLIC_URL%/board.js"></script>
+    <script src="%PUBLIC_URL%/calendar.js"></script>
+    <script src="%PUBLIC_URL%/inbox.js"></script>
+    <script src="%PUBLIC_URL%/pricing.js"></script>
+    
+    <script>
+      // Initialize the database and API when page loads
+      window.addEventListener('DOMContentLoaded', function() {
+        // Initialize the database first
+        window.db = new WorkShiftDB();
+        
+        // The API will be initialized automatically by api.js
+        // Just wait for it to be ready
+        
+        // Make functions globally available after API is ready
+        setTimeout(() => {
+          window.initializeLoginForm = typeof initializeLoginForm !== 'undefined' ? initializeLoginForm : () => {};
+          window.handleLogin = typeof handleLogin !== 'undefined' ? handleLogin : () => {};
+          window.showAuthError = typeof showAuthError !== 'undefined' ? showAuthError : () => {};
+          window.showAuthSuccess = typeof showAuthSuccess !== 'undefined' ? showAuthSuccess : () => {};
+          window.isValidEmail = typeof isValidEmail !== 'undefined' ? isValidEmail : () => {};
+          window.initializeDashboard = typeof initializeDashboard !== 'undefined' ? initializeDashboard : () => {};
+          window.loadBoards = typeof loadBoards !== 'undefined' ? loadBoards : () => {};
+          window.openModal = typeof openModal !== 'undefined' ? openModal : () => {};
+          window.openProfileModal = typeof openProfileModal !== 'undefined' ? openProfileModal : () => {};
+          window.initializeBoard = typeof initializeBoard !== 'undefined' ? initializeBoard : () => {};
+          window.initializeCalendar = typeof initializeCalendar !== 'undefined' ? initializeCalendar : () => {};
+          window.initializeInbox = typeof initializeInbox !== 'undefined' ? initializeInbox : () => {};
+          window.initializePricing = typeof initializePricing !== 'undefined' ? initializePricing : () => {};
+        }, 100);
+      });
+    </script>
   </body>
 </html>
