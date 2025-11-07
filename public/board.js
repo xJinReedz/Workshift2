@@ -766,17 +766,11 @@ function updateChecklistProgress(completed, total) {
     // Add complete class if all items are done
     if (completed === total && total > 0) {
         progressBar.classList.add('complete');
-        
-        // Automatically mark card as complete when checklist is 100%
-        autoCompleteCard();
     } else {
         progressBar.classList.remove('complete');
-        
-        // Automatically mark card as incomplete when checklist drops below 100%
-        if (total > 0 && completed < total) {
-            autoIncompleteCard();
-        }
     }
+    
+    // Note: Auto-complete/incomplete will now only happen when "Save Changes" is clicked
 }
 
 // Function to automatically mark card as complete
@@ -926,6 +920,9 @@ async function addChecklistItemInline() {
         
         loadChecklistItemsInline(cardId);
         cancelAddItem();
+        
+        // Show reminder to save changes
+        showNotification('Item added. Click "Save Changes" to apply.', 'info');
     } catch (error) {
         console.error('Error adding checklist item:', error);
         showNotification('Failed to add item', 'error');
@@ -946,20 +943,23 @@ async function toggleChecklistItemInline(itemId) {
                 item.is_completed = !item.is_completed;
             }
         } else {
+            // Convert itemId to number for consistent comparison
+            const numericItemId = parseInt(itemId);
+            
             // Get from database
-            item = window.db.findById('checklist_items', itemId);
+            item = window.db.findById('checklist_items', numericItemId);
             if (!item) {
                 showNotification('Checklist item not found', 'error');
                 return;
             }
             
-            // Store toggle change temporarily
-            const existingToggle = window.tempChecklistChanges.toggled.find(t => t.id === itemId);
+            // Store toggle change temporarily (using numeric ID for consistency)
+            const existingToggle = window.tempChecklistChanges.toggled.find(t => t.id === numericItemId);
             if (existingToggle) {
                 existingToggle.is_completed = !existingToggle.is_completed;
             } else {
                 window.tempChecklistChanges.toggled.push({
-                    id: itemId,
+                    id: numericItemId,
                     is_completed: !item.is_completed
                 });
             }
@@ -969,6 +969,9 @@ async function toggleChecklistItemInline(itemId) {
         if (window.currentCardId) {
             loadChecklistItemsInline(window.currentCardId);
         }
+        
+        // Show reminder to save changes
+        showNotification('Checklist updated. Click "Save Changes" to apply.', 'info');
         
     } catch (error) {
         console.error('Error toggling checklist item:', error);
@@ -986,17 +989,21 @@ async function deleteChecklistItemInline(itemId) {
             // Remove from temporary added items
             window.tempChecklistChanges.added = window.tempChecklistChanges.added.filter(i => i.id !== itemId);
         } else {
+            // Convert itemId to number for consistent comparison
+            const numericItemId = parseInt(itemId);
+            
             // Mark for deletion (will be deleted when "Save Changes" is clicked)
-            if (!window.tempChecklistChanges.deleted.includes(itemId)) {
-                window.tempChecklistChanges.deleted.push(itemId);
+            if (!window.tempChecklistChanges.deleted.includes(numericItemId)) {
+                window.tempChecklistChanges.deleted.push(numericItemId);
             }
         }
-        
-        showNotification('Item marked for deletion', 'info');
         
         if (window.currentCardId) {
             loadChecklistItemsInline(window.currentCardId);
         }
+        
+        // Show reminder to save changes
+        showNotification('Item marked for deletion. Click "Save Changes" to apply.', 'info');
     } catch (error) {
         console.error('Error deleting checklist item:', error);
         showNotification('Failed to delete item', 'error');
@@ -2219,7 +2226,7 @@ async function saveAllCardChanges() {
             // Save checklist changes
             await saveChecklistChanges(cardId);
             
-            showNotification('Card updated successfully', 'success');
+            showNotification('All changes saved successfully!', 'success');
             // Refresh the board display
             renderLists();
         } else {
@@ -2272,7 +2279,8 @@ async function saveChecklistChanges(cardId) {
         
         console.log('Checklist changes saved successfully');
         
-        // Check if all checklist items are now complete and auto-complete card if needed
+        // After saving, check if all checklist items are complete and auto-complete card if needed
+        // This only happens when user clicks "Save Changes" button
         const allItems = window.db.findBy('checklist_items', { card_id: cardId });
         if (allItems && allItems.length > 0) {
             const completedItems = allItems.filter(item => 
