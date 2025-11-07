@@ -1790,24 +1790,26 @@
 
 /* Card Title Editing Styles */
 .card-title-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  cursor: pointer !important;
+  padding: 8px 0 !important;
+  border-radius: 4px !important;
+  transition: background-color 0.2s !important;
+  border: none !important;
 }
 
 .card-title-display:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.02) !important;
 }
 
 .card-title-display h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
+  margin: 0 !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #172b4d !important;
+  line-height: 1.2 !important;
 }
 
 .edit-title-icon {
@@ -2474,6 +2476,62 @@
   gap: 1rem;
 }
 
+.card-title-container {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  flex: 1 !important;
+  margin-right: 20px !important;
+}
+
+.card-title-edit {
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  color: #172b4d !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 8px 0 !important;
+  border-radius: 0 !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  min-height: 36px !important;
+  resize: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.card-title-edit:hover {
+  background: rgba(9, 30, 66, 0.02) !important;
+}
+
+.card-title-edit:focus {
+  background: white !important;
+  box-shadow: inset 0 0 0 2px #0079bf !important;
+  outline: none !important;
+}
+
+.card-icon {
+  color: var(--text-light);
+  font-size: 1.25rem;
+  margin-top: 0.25rem;
+}
+
+.card-list-location {
+  margin-top: 2px !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  text-align: left !important;
+}
+
+.card-list-location small {
+  font-size: 12px !important;
+  color: #5e6c84 !important;
+  font-weight: 400 !important;
+  display: inline-block !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
 .card-modal-icon {
   color: var(--text-light);
   font-size: 1.25rem;
@@ -2485,17 +2543,21 @@
 }
 
 .card-modal-title h2 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0 !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #172b4d !important;
+  line-height: 1.2 !important;
 }
 
 /* Override for card title display - ensure visibility */
 .card-modal-title .card-title-display h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #333;
+  margin: 0 !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #172b4d !important;
   display: block !important;
+  line-height: 1.2 !important;
 }
 
 .card-modal-subtitle {
