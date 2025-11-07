@@ -473,15 +473,11 @@ function populateCardModal(card) {
         if (isCompleted) {
             // Card is completed, show "Mark as Incomplete" option
             completeButton.innerHTML = '<i class="fas fa-undo"></i> Mark as Incomplete';
-            completeButton.style.backgroundColor = '#6c757d'; // Grey
-            completeButton.style.color = '#ffffff'; // White text
-            completeButton.style.borderColor = '#6c757d';
+            completeButton.className = 'sidebar-btn warning-btn';
         } else {
             // Card is incomplete, show "Mark as Complete" option
             completeButton.innerHTML = '<i class="fas fa-check"></i> Mark as Complete';
-            completeButton.style.backgroundColor = '#28a745'; // Green
-            completeButton.style.color = '#ffffff'; // White text
-            completeButton.style.borderColor = '#28a745';
+            completeButton.className = 'sidebar-btn success-btn';
         }
     }
     
@@ -2011,24 +2007,21 @@ async function toggleCardComplete() {
         });
 
         if (updateResponse.success) {
-            const status = isCompleted ? 'incomplete' : 'complete';
-            showNotification(`Card marked as ${status}`, 'success');
+            const newStatus = !isCompleted; // The new status after toggle
+            const statusText = newStatus ? 'complete' : 'incomplete';
+            showNotification(`Card marked as ${statusText}`, 'success');
             
-            // Update button text and styling
+            // Update button text and styling based on NEW status
             const button = document.querySelector('button[onclick="toggleCardComplete()"]');
             if (button) {
-                if (isCompleted) {
-                    // Currently completed, so show "Mark as Complete" option
-                    button.innerHTML = '<i class="fas fa-check"></i> Mark as Complete';
-                    button.style.backgroundColor = '#28a745'; // Green
-                    button.style.color = '#ffffff'; // White text
-                    button.style.borderColor = '#28a745';
-                } else {
-                    // Currently incomplete, so show "Mark as Incomplete" option  
+                if (newStatus) {
+                    // Card is now completed, so show "Mark as Incomplete" option
                     button.innerHTML = '<i class="fas fa-undo"></i> Mark as Incomplete';
-                    button.style.backgroundColor = '#6c757d'; // Grey
-                    button.style.color = '#ffffff'; // White text
-                    button.style.borderColor = '#6c757d';
+                    button.className = 'sidebar-btn warning-btn';
+                } else {
+                    // Card is now incomplete, so show "Mark as Complete" option  
+                    button.innerHTML = '<i class="fas fa-check"></i> Mark as Complete';
+                    button.className = 'sidebar-btn success-btn';
                 }
             }
             

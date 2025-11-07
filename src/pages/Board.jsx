@@ -590,26 +590,26 @@ const Board = () => {
       
       {/* Board Statistics Modal */}
       <div id="board-statistics-modal" className="modal">
-        <div className="modal-content" style={{maxWidth: '800px'}}>
+        <div className="modal-content" style={{maxWidth: '900px'}}>
           <div className="modal-header">
-            <h3><i className="fas fa-chart-bar"></i> Detailed Board Statistics</h3>
+            <h3><i className="fas fa-chart-bar"></i> Board Statistics</h3>
             <button className="modal-close" onClick={closeBoardStatistics}>&times;</button>
           </div>
           <div className="modal-body">
             <div className="statistics-overview">
               <div className="stat-card">
                 <div className="stat-header">CARD COMPLETION RATE</div>
-                <div className="stat-value" id="cardCompletionRate">0%</div>
+                <div className="stat-value stat-percentage" id="cardCompletionRate">0%</div>
                 <div className="stat-description">Cards with 100% checklists done</div>
               </div>
               <div className="stat-card">
                 <div className="stat-header">COMPLETED CARDS</div>
-                <div className="stat-value" id="completedCards">0</div>
+                <div className="stat-value stat-number" id="completedCards">0</div>
                 <div className="stat-description" id="completedCardsDesc">Out of 0 total cards</div>
               </div>
               <div className="stat-card">
                 <div className="stat-header">CHECKLIST PROGRESS</div>
-                <div className="stat-value" id="checklistProgress">0%</div>
+                <div className="stat-value stat-percentage" id="checklistProgress">0%</div>
                 <div className="stat-description" id="checklistProgressDesc">0/0 individual checklists</div>
               </div>
             </div>
@@ -617,7 +617,7 @@ const Board = () => {
             <div className="detailed-progress">
               <h4>Detailed Progress by List</h4>
               <div id="listProgressContainer">
-                {/* List progress will be populated here */}
+                {/* List progress will be populated dynamically by updateStatisticsModal() */}
               </div>
             </div>
           </div>
