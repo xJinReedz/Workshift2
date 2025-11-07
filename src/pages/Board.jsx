@@ -15,6 +15,12 @@ const Board = () => {
         if (window.initializeBoard) {
           window.initializeBoard(boardId || 1);
         }
+        
+        // Initialize tab counts after a short delay to ensure DOM is ready
+        setTimeout(() => {
+          updateMemberCount();
+          updateRequestCount();
+        }, 200);
       }
     };
 
@@ -183,8 +189,28 @@ const Board = () => {
   };
 
   const saveListRename = () => {
+    // Let the JavaScript function handle the rename completely
     if (window.saveListRename) {
       window.saveListRename();
+    }
+  };
+
+  const closeDeleteListModal = () => {
+    if (window.closeDeleteListModal) {
+      window.closeDeleteListModal();
+    }
+  };
+
+  const confirmDeleteList = () => {
+    // Let the JavaScript function handle the delete completely
+    if (window.deleteList) {
+      // Get the list ID from the modal
+      const modal = document.getElementById('deleteConfirmationModal');
+      const confirmBtn = document.getElementById('confirmDeleteBtn');
+      // The JavaScript function should handle the deletion
+      if (confirmBtn && confirmBtn.onclick) {
+        confirmBtn.onclick();
+      }
     }
   };
 
@@ -225,9 +251,39 @@ const Board = () => {
   };
 
   const confirmRemoveMember = () => {
+    // Close the remove confirmation modal first
+    const confirmModal = document.getElementById('removeMemberModal');
+    if (confirmModal) confirmModal.classList.remove('active');
+    
+    // Get the member name to remove
+    const memberNameElement = document.getElementById('memberToRemoveName');
+    const memberToRemove = memberNameElement ? memberNameElement.textContent : '';
+    
+    // Remove the member from the DOM
+    if (memberToRemove) {
+      // Find and remove the member item from the invite modal
+      const memberItems = document.querySelectorAll('.member-item');
+      memberItems.forEach(item => {
+        const nameElement = item.querySelector('.member-name');
+        if (nameElement && nameElement.textContent === memberToRemove) {
+          item.remove();
+        }
+      });
+      
+      // Update the member count
+      updateMemberCount();
+    }
+    
+    // Execute the removal logic
     if (window.confirmRemoveMember) {
       window.confirmRemoveMember();
     }
+    
+    // Show success modal after a brief delay
+    setTimeout(() => {
+      const successModal = document.getElementById('memberRemovedModal');
+      if (successModal) successModal.classList.add('active');
+    }, 100);
   };
 
   const closeJoinRequestModal = () => {
@@ -239,6 +295,40 @@ const Board = () => {
   const confirmJoinRequest = () => {
     if (window.confirmJoinRequest) {
       window.confirmJoinRequest();
+    }
+  };
+
+  const closeRequestAcceptedModal = () => {
+    if (window.closeRequestAcceptedModal) {
+      window.closeRequestAcceptedModal();
+    }
+  };
+
+  const closeRequestDeclinedModal = () => {
+    if (window.closeRequestDeclinedModal) {
+      window.closeRequestDeclinedModal();
+    }
+  };
+
+  const closeMemberRemovedModal = () => {
+    if (window.closeMemberRemovedModal) {
+      window.closeMemberRemovedModal();
+    }
+  };
+
+  const updateMemberCount = () => {
+    const memberItems = document.querySelectorAll('#boardMembersList .member-item');
+    const memberCountElement = document.querySelector('[data-tab="members"] .tab-count');
+    if (memberCountElement) {
+      memberCountElement.textContent = memberItems.length;
+    }
+  };
+
+  const updateRequestCount = () => {
+    const requestItems = document.querySelectorAll('#joinRequestsList .request-item');
+    const requestCountElement = document.querySelector('[data-tab="requests"] .tab-count');
+    if (requestCountElement) {
+      requestCountElement.textContent = requestItems.length;
     }
   };
 
@@ -330,7 +420,6 @@ const Board = () => {
               <div className="avatar" style={{background: '#61bd4f'}} title="Paolo Rayos">PR</div>
               <div className="avatar" style={{background: '#f2d600', color: '#333'}} title="Elijah Sintor">ES</div>
               <div className="avatar" style={{background: '#eb5a46'}} title="Nathaniel Andrada">NA</div>
-              <div className="avatar" style={{background: '#c377e0'}} title="Andrew Llego">AL</div>
             </div>
            
             <div id="manila-clock" className="manila-clock" title="Manila (PHT)"></div>
@@ -645,7 +734,6 @@ const Board = () => {
                 <select id="permissionLevel" name="permission" className="form-control invite-permission-select" required>
                   <option value="view">Can view</option>
                   <option value="edit">Can edit</option>
-                  <option value="admin">Admin</option>
                 </select>
               </div>
               <div className="form-actions invite-form-actions">
@@ -693,9 +781,13 @@ const Board = () => {
                         <select className="member-permission-select">
                           <option value="edit" selected>Can edit</option>
                           <option value="view">Can view</option>
-                          <option value="admin">Admin</option>
                         </select>
-                        <button className="btn btn-danger btn-sm member-remove-btn">Remove</button>
+                        <button className="btn btn-danger btn-sm member-remove-btn" onClick={() => {
+                          const modal = document.getElementById('removeMemberModal');
+                          const memberName = document.getElementById('memberToRemoveName');
+                          if (memberName) memberName.textContent = 'Paolo Rayos';
+                          if (modal) modal.classList.add('active');
+                        }}>Remove</button>
                       </div>
                     </div>
                     <div className="member-item">
@@ -708,9 +800,13 @@ const Board = () => {
                         <select className="member-permission-select">
                           <option value="edit" selected>Can edit</option>
                           <option value="view">Can view</option>
-                          <option value="admin">Admin</option>
                         </select>
-                        <button className="btn btn-danger btn-sm member-remove-btn">Remove</button>
+                        <button className="btn btn-danger btn-sm member-remove-btn" onClick={() => {
+                          const modal = document.getElementById('removeMemberModal');
+                          const memberName = document.getElementById('memberToRemoveName');
+                          if (memberName) memberName.textContent = 'Nathaniel Andrada';
+                          if (modal) modal.classList.add('active');
+                        }}>Remove</button>
                       </div>
                     </div>
                     <div className="member-item">
@@ -723,9 +819,13 @@ const Board = () => {
                         <select className="member-permission-select">
                           <option value="view" selected>Can view</option>
                           <option value="edit">Can edit</option>
-                          <option value="admin">Admin</option>
                         </select>
-                        <button className="btn btn-danger btn-sm member-remove-btn">Remove</button>
+                        <button className="btn btn-danger btn-sm member-remove-btn" onClick={() => {
+                          const modal = document.getElementById('removeMemberModal');
+                          const memberName = document.getElementById('memberToRemoveName');
+                          if (memberName) memberName.textContent = 'Elijah Sintor';
+                          if (modal) modal.classList.add('active');
+                        }}>Remove</button>
                       </div>
                     </div>
                   </div>
@@ -739,12 +839,79 @@ const Board = () => {
                       <div className="request-info">
                         <div className="request-name">Andrew Llego</div>
                         <div className="request-email">andrew@gmail.com</div>
-                        <div className="request-message">"I'd like to contribute to this project"</div>
                         <div className="request-date">Requested 2 hours ago</div>
                       </div>
                       <div className="request-actions">
-                        <button className="btn btn-success btn-sm">Accept</button>
-                        <button className="btn btn-danger btn-sm">Decline</button>
+                        <button className="btn btn-success btn-sm" onClick={() => {
+                          // Remove the request from join requests list
+                          const requestItem = document.querySelector('.request-item');
+                          if (requestItem) {
+                            requestItem.remove();
+                            // Update request count
+                            updateRequestCount();
+                          }
+                          
+                          // Add the user to board members list
+                          const membersList = document.querySelector('#boardMembersList');
+                          if (membersList) {
+                            const newMember = document.createElement('div');
+                            newMember.className = 'member-item';
+                            newMember.innerHTML = `
+                              <div class="member-avatar" style="background: #c377e0">AL</div>
+                              <div class="member-info">
+                                <div class="member-name">Andrew Llego</div>
+                                <div class="member-role">Can edit • andrew@gmail.com</div>
+                              </div>
+                              <div class="member-actions">
+                                <select class="member-permission-select">
+                                  <option value="edit" selected>Can edit</option>
+                                  <option value="view">Can view</option>
+                                </select>
+                                <button class="btn btn-danger btn-sm member-remove-btn">Remove</button>
+                              </div>
+                            `;
+                            membersList.appendChild(newMember);
+                            
+                            // Update member count
+                            updateMemberCount();
+                            
+                            // Add click handler to the new remove button
+                            const newRemoveBtn = newMember.querySelector('.member-remove-btn');
+                            if (newRemoveBtn) {
+                              newRemoveBtn.addEventListener('click', () => {
+                                const modal = document.getElementById('removeMemberModal');
+                                const memberName = document.getElementById('memberToRemoveName');
+                                if (memberName) memberName.textContent = 'Andrew Llego';
+                                if (modal) modal.classList.add('active');
+                              });
+                            }
+                          }
+                          
+                          // Close invite modal and show success modal
+                          const inviteModal = document.getElementById('inviteModal');
+                          const successModal = document.getElementById('requestAcceptedModal');
+                          if (inviteModal) inviteModal.classList.remove('active');
+                          setTimeout(() => {
+                            if (successModal) successModal.classList.add('active');
+                          }, 100);
+                        }}>Accept</button>
+                        <button className="btn btn-danger btn-sm" onClick={() => {
+                          // Remove the request from join requests list
+                          const requestItem = document.querySelector('.request-item');
+                          if (requestItem) {
+                            requestItem.remove();
+                            // Update request count
+                            updateRequestCount();
+                          }
+                          
+                          // Close invite modal and show success modal
+                          const inviteModal = document.getElementById('inviteModal');
+                          const successModal = document.getElementById('requestDeclinedModal');
+                          if (inviteModal) inviteModal.classList.remove('active');
+                          setTimeout(() => {
+                            if (successModal) successModal.classList.add('active');
+                          }, 100);
+                        }}>Decline</button>
                       </div>
                     </div>
                   </div>
@@ -811,6 +978,85 @@ const Board = () => {
             <div className="confirm-actions">
               <button className="btn btn-secondary" onClick={closeRemoveMemberModal}>Cancel</button>
               <button className="btn btn-danger" onClick={confirmRemoveMember}>Remove</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Request Accepted Success Modal */}
+      <div id="requestAcceptedModal" className="modal">
+        <div className="modal-content success-modal-content">
+          <div className="modal-body success-modal-body">
+            <div className="success-icon">
+              <i className="fas fa-check-circle"></i>
+            </div>
+            <h3>Request Accepted!</h3>
+            <p>The join request has been accepted. The user has been added to the board and will receive a notification.</p>
+            <button className="btn btn-primary success-ok-btn" onClick={closeRequestAcceptedModal}>OK</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Request Declined Success Modal */}
+      <div id="requestDeclinedModal" className="modal">
+        <div className="modal-content success-modal-content">
+          <div className="modal-body success-modal-body">
+            <div className="success-icon">
+              <i className="fas fa-times-circle" style={{color: '#ef4444'}}></i>
+            </div>
+            <h3>Request Declined</h3>
+            <p>The join request has been declined. The user will be notified of the decision.</p>
+            <button className="btn btn-primary success-ok-btn" onClick={closeRequestDeclinedModal}>OK</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Member Removed Success Modal */}
+      <div id="memberRemovedModal" className="modal">
+        <div className="modal-content success-modal-content">
+          <div className="modal-body success-modal-body">
+            <div className="success-icon">
+              <i className="fas fa-user-minus" style={{color: '#ef4444'}}></i>
+            </div>
+            <h3>Member Removed</h3>
+            <p>The member has been successfully removed from the board.</p>
+            <button className="btn btn-primary success-ok-btn" onClick={closeMemberRemovedModal}>OK</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Rename List Modal */}
+      <div id="renameListModal" className="modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Rename List</h3>
+            <button className="modal-close" onClick={closeRenameListModal}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label htmlFor="renameListInput">List Name</label>
+              <input type="text" id="renameListInput" className="form-control" placeholder="Enter new list name" />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn btn-secondary" onClick={closeRenameListModal}>Cancel</button>
+            <button className="btn btn-primary" onClick={saveListRename}>Save</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete List Confirmation Modal */}
+      <div id="deleteConfirmationModal" className="modal">
+        <div className="modal-content confirm-modal-content">
+          <div className="modal-body confirm-modal-body">
+            <div className="warning-icon">
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="deleteConfirmationTitle">Delete List</h3>
+            <p id="deleteConfirmationMessage">Are you sure you want to delete this list? This action cannot be undone and will remove all cards in this list.</p>
+            <div className="confirm-actions">
+              <button className="btn btn-secondary" id="cancelDeleteBtn">Cancel</button>
+              <button className="btn btn-danger" id="confirmDeleteBtn">Delete</button>
             </div>
           </div>
         </div>

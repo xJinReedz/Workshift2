@@ -3221,12 +3221,27 @@
     padding: 1.5rem;
     max-height: 70vh;
     overflow-y: auto;
+    text-align: left;
 }
 
 .invite-form {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
     border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.invite-form .form-group {
+    text-align: left;
+    margin-bottom: 1rem;
+}
+
+.invite-form label {
+    text-align: left;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
 }
 
 .invite-email-input,
@@ -3237,6 +3252,7 @@
     border-radius: 6px;
     font-size: 0.875rem;
     margin-top: 0.25rem;
+    text-align: left;
 }
 
 .invite-email-input:focus,
@@ -3351,9 +3367,23 @@
     flex-shrink: 0;
 }
 
+.request-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
 .member-info {
     flex: 1;
     min-width: 0;
+    text-align: left;
 }
 
 .member-name {
@@ -3361,11 +3391,13 @@
     color: #1e293b;
     font-size: 0.875rem;
     margin-bottom: 0.125rem;
+    text-align: left;
 }
 
 .member-role {
     color: #64748b;
     font-size: 0.75rem;
+    text-align: left;
 }
 
 .member-status {
@@ -3420,12 +3452,50 @@
     border-radius: 4px;
 }
 
+/* Request Info Styles */
+.request-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}
+
+.request-name {
+    font-weight: 500;
+    color: #1e293b;
+    font-size: 0.875rem;
+    margin-bottom: 0.125rem;
+    text-align: left;
+}
+
+.request-email {
+    color: #64748b;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+    text-align: left;
+}
+
+.request-date {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    text-align: left;
+}
+
 /* Success and Confirmation Modal Styles */
 .success-modal-content,
 .confirm-modal-content {
     max-width: 400px;
     width: 90%;
     text-align: center;
+}
+
+#requestAcceptedModal,
+#requestDeclinedModal,
+#memberRemovedModal,
+#invitationSuccessModal,
+#removeMemberModal,
+#renameListModal,
+#deleteConfirmationModal {
+    z-index: 15000 !important;
 }
 
 .success-modal-body,

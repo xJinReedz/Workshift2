@@ -2129,8 +2129,19 @@ function showListDropdown(buttonElement, listId) {
     const renameBtn = document.getElementById('renameListBtn');
     const deleteBtn = document.getElementById('deleteListBtn');
 
-    renameBtn.onclick = () => openRenameListModal(listId);
-    deleteBtn.onclick = () => confirmDeleteList(listId);
+    if (renameBtn) {
+        renameBtn.onclick = () => {
+            console.log('Rename button clicked for list:', listId);
+            openRenameListModal(listId);
+        };
+    }
+    
+    if (deleteBtn) {
+        deleteBtn.onclick = () => {
+            console.log('Delete button clicked for list:', listId);
+            confirmDeleteList(listId);
+        };
+    }
 }
 
 // Close dropdown on outside click
@@ -2487,6 +2498,7 @@ async function autoSaveCardDescription() {
 
 // Rename list functionality
 function openRenameListModal(listId) {
+    console.log('Opening rename modal for list:', listId);
     closeListDropdown();
     
     const list = window.db.findById('lists', parseInt(listId));
@@ -2497,6 +2509,8 @@ function openRenameListModal(listId) {
 
     const modal = document.getElementById('renameListModal');
     const input = document.getElementById('renameListInput');
+    
+    console.log('Modal found:', !!modal, 'Input found:', !!input);
     
     if (modal && input) {
         input.value = list.title;
@@ -2558,6 +2572,7 @@ function saveListRename() {
 
 // Delete list functionality
 function confirmDeleteList(listId) {
+    console.log('Confirming delete for list:', listId);
     closeListDropdown();
     
     const list = window.db.findById('lists', parseInt(listId));
@@ -2571,6 +2586,13 @@ function confirmDeleteList(listId) {
     const titleElement = document.getElementById('deleteConfirmationTitle');
     const messageElement = document.getElementById('deleteConfirmationMessage');
     const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    console.log('Delete modal elements found:', {
+        modal: !!modal,
+        title: !!titleElement,
+        message: !!messageElement,
+        confirmBtn: !!confirmBtn
+    });
     
     if (modal && titleElement && messageElement && confirmBtn) {
         titleElement.textContent = `Delete "${list.title}"?`;
@@ -2598,6 +2620,14 @@ function confirmDeleteList(listId) {
 
 function closeDeleteConfirmationModal() {
     const modal = document.getElementById('deleteConfirmationModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function closeDeleteListModal() {
+    const modal = document.getElementById('deleteListModal');
     if (modal) {
         modal.classList.remove('active');
         document.body.classList.remove('modal-open');
@@ -2969,6 +2999,7 @@ window.openRenameListModal = openRenameListModal;
 window.closeRenameListModal = closeRenameListModal;
 window.saveListRename = saveListRename;
 window.confirmDeleteList = confirmDeleteList;
+window.closeDeleteListModal = closeDeleteListModal;
 window.closeDeleteConfirmationModal = closeDeleteConfirmationModal;
 window.deleteList = deleteList;
 // Countdown timer functionality
@@ -3548,6 +3579,30 @@ function closeJoinRequestModal() {
     requestAction = null;
 }
 
+function closeRequestAcceptedModal() {
+    const modal = document.getElementById('requestAcceptedModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function closeRequestDeclinedModal() {
+    const modal = document.getElementById('requestDeclinedModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function closeMemberRemovedModal() {
+    const modal = document.getElementById('memberRemovedModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
 function confirmJoinRequest() {
     if (requestToHandle && requestAction) {
         if (requestAction === 'accept') {
@@ -3669,6 +3724,9 @@ window.closeInvitationSuccessModal = closeInvitationSuccessModal;
 window.showRemoveMemberModal = showRemoveMemberModal;
 window.closeRemoveMemberModal = closeRemoveMemberModal;
 window.confirmRemoveMember = confirmRemoveMember;
+window.closeRequestAcceptedModal = closeRequestAcceptedModal;
+window.closeRequestDeclinedModal = closeRequestDeclinedModal;
+window.closeMemberRemovedModal = closeMemberRemovedModal;
 window.showJoinRequestModal = showJoinRequestModal;
 window.closeJoinRequestModal = closeJoinRequestModal;
 window.confirmJoinRequest = confirmJoinRequest;
