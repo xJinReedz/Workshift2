@@ -6210,6 +6210,7 @@ textarea.card-description:focus {
     min-width: 0;
     display: flex;
     align-items: center;
+    gap: 0.5rem;
 }
 
 .checklist-item-inline .item-content .item-text {

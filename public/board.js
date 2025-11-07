@@ -339,6 +339,13 @@ async function openCardModal(cardId) {
         return;
     }
     
+    // Initialize temporary checklist changes
+    window.tempChecklistChanges = {
+        added: [],
+        deleted: [],
+        toggled: []
+    };
+    
     try {
         // Show the modal immediately
         const modal = document.getElementById('card-detail-modal');
@@ -388,18 +395,16 @@ function populateCardModal(card) {
         titleEdit.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                saveCardTitle();
+                // Just blur the field - user must click "Save Changes" to save
+                titleEdit.blur();
             }
             if (e.key === 'Escape') {
                 titleEdit.value = card.title || '';
+                titleEdit.blur();
             }
         });
         
-        titleEdit.addEventListener('blur', function() {
-            if (titleEdit.value.trim() !== (card.title || '').trim()) {
-                saveCardTitle();
-            }
-        });
+        // Removed auto-save on blur - now requires manual save via "Save Changes" button
     }
 
     // Set list location
@@ -416,28 +421,7 @@ function populateCardModal(card) {
     if (descriptionTextarea) {
         descriptionTextarea.value = card.description || '';
         
-        // Add auto-save functionality for description
-        let descriptionSaveTimeout;
-        
-        descriptionTextarea.addEventListener('input', function() {
-            // Clear existing timeout
-            if (descriptionSaveTimeout) {
-                clearTimeout(descriptionSaveTimeout);
-            }
-            
-            // Set new timeout to save after 1 second of no typing
-            descriptionSaveTimeout = setTimeout(() => {
-                autoSaveCardDescription();
-            }, 1000);
-        });
-        
-        descriptionTextarea.addEventListener('blur', function() {
-            // Save immediately when field loses focus
-            if (descriptionSaveTimeout) {
-                clearTimeout(descriptionSaveTimeout);
-            }
-            autoSaveCardDescription();
-        });
+        // Removed auto-save functionality - description now requires manual save via "Save Changes" button
     }
 
     // Set due date if exists
@@ -692,7 +676,29 @@ function loadChecklistItemsInline(cardId) {
     const checklistContainer = document.getElementById('checklistItemsInline');
     if (!checklistContainer) return;
     
-    const items = window.db.findBy('checklist_items', { card_id: cardId });
+    // Get saved items from database
+    let items = window.db.findBy('checklist_items', { card_id: cardId }) || [];
+    
+    // Filter out items marked for deletion
+    if (window.tempChecklistChanges && window.tempChecklistChanges.deleted) {
+        items = items.filter(item => !window.tempChecklistChanges.deleted.includes(item.id));
+    }
+    
+    // Add temporary items that haven't been saved yet
+    if (window.tempChecklistChanges && window.tempChecklistChanges.added) {
+        items = [...items, ...window.tempChecklistChanges.added];
+    }
+    
+    // Apply toggle changes
+    if (window.tempChecklistChanges && window.tempChecklistChanges.toggled) {
+        items = items.map(item => {
+            const toggledItem = window.tempChecklistChanges.toggled.find(t => t.id === item.id);
+            if (toggledItem) {
+                return { ...item, is_completed: toggledItem.is_completed };
+            }
+            return item;
+        });
+    }
     
     if (!items || items.length === 0) {
         checklistContainer.innerHTML = '';
@@ -704,17 +710,17 @@ function loadChecklistItemsInline(cardId) {
         <div class="checklist-item-inline" data-item-id="${item.id}">
             <div class="item-checkbox">
                 <input type="checkbox" id="item-inline-${item.id}" ${item.is_completed ? 'checked' : ''} 
-                       onchange="toggleChecklistItemInline(${item.id})">
+                       onchange="toggleChecklistItemInline('${item.id}')">
                 <label for="item-inline-${item.id}"></label>
             </div>
             <div class="item-content ${item.is_completed ? 'completed' : ''}">
                 <span class="item-text">${escapeHtml(item.content)}</span>
             </div>
             <div class="item-actions">
-                <button class="btn-icon btn-edit" onclick="openEditChecklistItemModal(${item.id})" title="Edit">
+                <button class="btn-icon btn-edit" onclick="openEditChecklistItemModal('${item.id}')" title="Edit">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn-icon btn-danger" onclick="openDeleteChecklistItemModal(${item.id})" title="Delete">
+                <button class="btn-icon btn-danger" onclick="deleteChecklistItemInline('${item.id}')" title="Delete">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -875,6 +881,14 @@ function cancelAddItem() {
 }
 
 // Add checklist item inline
+// Temporary storage for unsaved checklist items
+window.tempChecklistItems = [];
+window.tempChecklistChanges = {
+    added: [],
+    deleted: [],
+    toggled: []
+};
+
 async function addChecklistItemInline() {
     const input = document.getElementById('newChecklistItemInline');
     const cardId = window.currentCardId;
@@ -888,21 +902,21 @@ async function addChecklistItemInline() {
     }
     
     try {
+        // Create temporary item (not saved to database yet)
         const item = {
+            id: 'temp_' + Date.now(), // Temporary ID
             card_id: cardId,
             content: content,
             is_completed: false,
-            position: Date.now() // Use timestamp for simple ordering
+            position: Date.now(),
+            isTemp: true // Flag to identify unsaved items
         };
         
-        const result = window.db.insert('checklist_items', item);
-        if (result && result.id) {
-            showNotification('Item added successfully', 'success');
-            loadChecklistItemsInline(cardId);
-            cancelAddItem();
-        } else {
-            showNotification('Failed to add item', 'error');
-        }
+        // Add to temporary storage
+        window.tempChecklistChanges.added.push(item);
+        
+        loadChecklistItemsInline(cardId);
+        cancelAddItem();
     } catch (error) {
         console.error('Error adding checklist item:', error);
         showNotification('Failed to add item', 'error');
@@ -912,41 +926,40 @@ async function addChecklistItemInline() {
 // Toggle checklist item inline
 async function toggleChecklistItemInline(itemId) {
     try {
-        const item = window.db.findById('checklist_items', itemId);
-        if (!item) {
-            showNotification('Checklist item not found', 'error');
-            return;
-        }
+        // Check if it's a temp item
+        const isTemp = String(itemId).startsWith('temp_');
         
-        // Toggle completion status
-        const newStatus = !item.is_completed;
-        window.db.update('checklist_items', itemId, {
-            is_completed: newStatus
-        });
-        
-        // Update UI
-        const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
-        if (itemElement) {
-            const contentElement = itemElement.querySelector('.item-content');
-            const checkbox = itemElement.querySelector('input[type="checkbox"]');
+        let item;
+        if (isTemp) {
+            // Find in temporary added items
+            item = window.tempChecklistChanges.added.find(i => i.id === itemId);
+            if (item) {
+                item.is_completed = !item.is_completed;
+            }
+        } else {
+            // Get from database
+            item = window.db.findById('checklist_items', itemId);
+            if (!item) {
+                showNotification('Checklist item not found', 'error');
+                return;
+            }
             
-            if (newStatus) {
-                contentElement.classList.add('completed');
-                checkbox.checked = true;
+            // Store toggle change temporarily
+            const existingToggle = window.tempChecklistChanges.toggled.find(t => t.id === itemId);
+            if (existingToggle) {
+                existingToggle.is_completed = !existingToggle.is_completed;
             } else {
-                contentElement.classList.remove('completed');
-                checkbox.checked = false;
+                window.tempChecklistChanges.toggled.push({
+                    id: itemId,
+                    is_completed: !item.is_completed
+                });
             }
         }
         
-        // Update progress bar
+        // Reload to show changes
         if (window.currentCardId) {
-            const items = window.db.findBy('checklist_items', { card_id: window.currentCardId });
-            const completedItems = items.filter(item => item.is_completed).length;
-            updateChecklistProgress(completedItems, items.length);
+            loadChecklistItemsInline(window.currentCardId);
         }
-        
-        // Progress bar is updated by the loadChecklistItemsInline function
         
     } catch (error) {
         console.error('Error toggling checklist item:', error);
@@ -956,19 +969,24 @@ async function toggleChecklistItemInline(itemId) {
 
 // Delete checklist item inline
 async function deleteChecklistItemInline(itemId) {
-    if (!confirm('Are you sure you want to delete this item?')) {
-        return;
-    }
-    
     try {
-        const result = window.db.delete('checklist_items', itemId);
-        if (result) {
-            showNotification('Item deleted successfully', 'success');
-            if (window.currentCardId) {
-                loadChecklistItemsInline(window.currentCardId);
-            }
+        // Check if it's a temp item
+        const isTemp = String(itemId).startsWith('temp_');
+        
+        if (isTemp) {
+            // Remove from temporary added items
+            window.tempChecklistChanges.added = window.tempChecklistChanges.added.filter(i => i.id !== itemId);
         } else {
-            showNotification('Failed to delete item', 'error');
+            // Mark for deletion (will be deleted when "Save Changes" is clicked)
+            if (!window.tempChecklistChanges.deleted.includes(itemId)) {
+                window.tempChecklistChanges.deleted.push(itemId);
+            }
+        }
+        
+        showNotification('Item marked for deletion', 'info');
+        
+        if (window.currentCardId) {
+            loadChecklistItemsInline(window.currentCardId);
         }
     } catch (error) {
         console.error('Error deleting checklist item:', error);
@@ -1094,6 +1112,14 @@ async function confirmDeleteChecklistItem() {
 // Close card modal
 function closeCardModal() {
     console.log("Closing card modal");
+    
+    // Clear temporary checklist changes (discard unsaved changes)
+    window.tempChecklistChanges = {
+        added: [],
+        deleted: [],
+        toggled: []
+    };
+    
     const modal = document.getElementById('card-detail-modal');
     if (modal) {
         modal.classList.remove('active');
@@ -2077,6 +2103,9 @@ async function saveAllCardChanges() {
         });
 
         if (response.success) {
+            // Save checklist changes
+            await saveChecklistChanges(cardId);
+            
             showNotification('Card updated successfully', 'success');
             // Refresh the board display
             renderLists();
@@ -2086,6 +2115,52 @@ async function saveAllCardChanges() {
     } catch (error) {
         console.error('Error saving card changes:', error);
         showNotification('Failed to save changes', 'error');
+    }
+}
+
+// Save checklist changes to database
+async function saveChecklistChanges(cardId) {
+    try {
+        // Add new items
+        if (window.tempChecklistChanges.added && window.tempChecklistChanges.added.length > 0) {
+            for (const item of window.tempChecklistChanges.added) {
+                const newItem = {
+                    card_id: cardId,
+                    content: item.content,
+                    is_completed: item.is_completed,
+                    position: item.position
+                };
+                window.db.insert('checklist_items', newItem);
+            }
+        }
+        
+        // Delete marked items
+        if (window.tempChecklistChanges.deleted && window.tempChecklistChanges.deleted.length > 0) {
+            for (const itemId of window.tempChecklistChanges.deleted) {
+                window.db.delete('checklist_items', itemId);
+            }
+        }
+        
+        // Update toggled items
+        if (window.tempChecklistChanges.toggled && window.tempChecklistChanges.toggled.length > 0) {
+            for (const item of window.tempChecklistChanges.toggled) {
+                window.db.update('checklist_items', item.id, {
+                    is_completed: item.is_completed
+                });
+            }
+        }
+        
+        // Clear temporary changes
+        window.tempChecklistChanges = {
+            added: [],
+            deleted: [],
+            toggled: []
+        };
+        
+        console.log('Checklist changes saved successfully');
+    } catch (error) {
+        console.error('Error saving checklist changes:', error);
+        throw error;
     }
 }
 
