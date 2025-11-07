@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 
 const Board = () => {
   const navigate = useNavigate();
   const { boardId } = useParams();
+  const [isCardCompleted, setIsCardCompleted] = useState(false);
 
   useEffect(() => {
     const initializePage = () => {
@@ -97,6 +98,16 @@ const Board = () => {
       window.toggleCardComplete();
     }
   };
+
+  // Function to update card completion state from JavaScript
+  const updateCardCompletionState = (isCompleted) => {
+    setIsCardCompleted(isCompleted);
+  };
+
+  // Expose the function to window so JavaScript can call it
+  useEffect(() => {
+    window.updateCardCompletionState = updateCardCompletionState;
+  }, []);
 
   const showAttachmentUpload = () => {
     if (window.showAttachmentUpload) {
@@ -558,9 +569,6 @@ const Board = () => {
                     </div>
                     <div className="add-comment-section">
                       <div className="comment-composer">
-                        <div className="composer-avatar">
-                          <div className="user-avatar">LT</div>
-                        </div>
                         <div className="composer-input-container">
                           <textarea 
                             id="commentInput" 
@@ -575,9 +583,6 @@ const Board = () => {
                             <button className="btn btn-primary btn-sm" onClick={addComment}>
                               <i className="fas fa-paper-plane"></i>
                               Comment
-                            </button>
-                            <button className="btn btn-secondary btn-sm" onClick={cancelComment}>
-                              Cancel
                             </button>
                           </div>
                         </div>
@@ -609,9 +614,12 @@ const Board = () => {
                       <i className="fas fa-save"></i>
                       Save Changes
                     </button>
-                    <button className="sidebar-btn success-btn" onClick={toggleCardComplete}>
-                      <i className="fas fa-check"></i>
-                      Mark as Complete
+                    <button 
+                      className={`sidebar-btn ${isCardCompleted ? 'warning-btn' : 'success-btn'}`} 
+                      onClick={toggleCardComplete}
+                    >
+                      <i className={`fas ${isCardCompleted ? 'fa-undo' : 'fa-check'}`}></i>
+                      {isCardCompleted ? 'Mark as Incomplete' : 'Mark as Complete'}
                     </button>
                   </div>
                 </div>

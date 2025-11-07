@@ -466,19 +466,12 @@ function populateCardModal(card) {
     console.log('Loading attachments for card:', card.id, 'Found:', attachments);
     displayCardAttachments(attachments || []);
     
-    // Set initial button styling based on completion status
-    const completeButton = document.querySelector('button[onclick="toggleCardComplete()"]');
-    if (completeButton) {
-        const isCompleted = !!(card.is_completed === 1 || card.is_completed === true);
-        if (isCompleted) {
-            // Card is completed, show "Mark as Incomplete" option
-            completeButton.innerHTML = '<i class="fas fa-undo"></i> Mark as Incomplete';
-            completeButton.className = 'sidebar-btn warning-btn';
-        } else {
-            // Card is incomplete, show "Mark as Complete" option
-            completeButton.innerHTML = '<i class="fas fa-check"></i> Mark as Complete';
-            completeButton.className = 'sidebar-btn success-btn';
-        }
+    // Set initial button styling based on completion status and update React state
+    const isCompleted = !!(card.is_completed === 1 || card.is_completed === true);
+    
+    // Update React component state instead of DOM manipulation
+    if (window.updateCardCompletionState) {
+        window.updateCardCompletionState(isCompleted);
     }
     
     // Add real-time validation for deadline fields
@@ -2011,18 +2004,9 @@ async function toggleCardComplete() {
             const statusText = newStatus ? 'complete' : 'incomplete';
             showNotification(`Card marked as ${statusText}`, 'success');
             
-            // Update button text and styling based on NEW status
-            const button = document.querySelector('button[onclick="toggleCardComplete()"]');
-            if (button) {
-                if (newStatus) {
-                    // Card is now completed, so show "Mark as Incomplete" option
-                    button.innerHTML = '<i class="fas fa-undo"></i> Mark as Incomplete';
-                    button.className = 'sidebar-btn warning-btn';
-                } else {
-                    // Card is now incomplete, so show "Mark as Complete" option  
-                    button.innerHTML = '<i class="fas fa-check"></i> Mark as Complete';
-                    button.className = 'sidebar-btn success-btn';
-                }
+            // Update React component state instead of DOM manipulation
+            if (window.updateCardCompletionState) {
+                window.updateCardCompletionState(newStatus);
             }
             
             // Refresh the board display

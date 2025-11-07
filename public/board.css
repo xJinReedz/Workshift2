@@ -2696,6 +2696,8 @@
   font-size: 0.875rem;
   text-align: left;
   box-sizing: border-box;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .sidebar-btn:hover {
@@ -5144,7 +5146,7 @@
 }
 
 .card-sidebar {
-    width: 200px;
+    width: 240px;
     flex-shrink: 0;
 }
 
