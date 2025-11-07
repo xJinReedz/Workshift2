@@ -711,7 +711,10 @@ function loadChecklistItemsInline(cardId) {
                 <span class="item-text">${escapeHtml(item.content)}</span>
             </div>
             <div class="item-actions">
-                <button class="btn-icon btn-danger" onclick="deleteChecklistItemInline(${item.id})" title="Delete">
+                <button class="btn-icon btn-edit" onclick="openEditChecklistItemModal(${item.id})" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon btn-danger" onclick="openDeleteChecklistItemModal(${item.id})" title="Delete">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -964,6 +967,121 @@ async function deleteChecklistItemInline(itemId) {
             if (window.currentCardId) {
                 loadChecklistItemsInline(window.currentCardId);
             }
+        } else {
+            showNotification('Failed to delete item', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting checklist item:', error);
+        showNotification('Failed to delete item', 'error');
+    }
+}
+
+// Variables for checklist item editing
+let editingChecklistItemId = null;
+
+// Open edit checklist item modal
+function openEditChecklistItemModal(itemId) {
+    const item = window.db.findById('checklist_items', parseInt(itemId));
+    if (!item) {
+        showNotification('Checklist item not found', 'error');
+        return;
+    }
+    
+    editingChecklistItemId = itemId;
+    
+    const modal = document.getElementById('edit-checklist-item-modal');
+    const input = document.getElementById('editChecklistItemInput');
+    
+    if (modal && input) {
+        input.value = item.content;
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+        input.focus();
+    }
+}
+
+// Close edit checklist item modal
+function closeEditChecklistItemModal() {
+    const modal = document.getElementById('edit-checklist-item-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+    editingChecklistItemId = null;
+}
+
+// Save checklist item edit
+async function saveChecklistItemEdit() {
+    if (!editingChecklistItemId) return;
+    
+    const input = document.getElementById('editChecklistItemInput');
+    const newContent = input.value.trim();
+    
+    if (!newContent) {
+        showNotification('Item content cannot be empty', 'error');
+        return;
+    }
+    
+    try {
+        const result = window.db.update('checklist_items', parseInt(editingChecklistItemId), {
+            content: newContent
+        });
+        
+        if (result) {
+            showNotification('Item updated successfully', 'success');
+            loadChecklistItemsInline(window.currentCardId);
+            closeEditChecklistItemModal();
+        } else {
+            showNotification('Failed to update item', 'error');
+        }
+    } catch (error) {
+        console.error('Error updating checklist item:', error);
+        showNotification('Failed to update item', 'error');
+    }
+}
+
+// Open delete checklist item modal
+function openDeleteChecklistItemModal(itemId) {
+    const item = window.db.findById('checklist_items', parseInt(itemId));
+    if (!item) {
+        showNotification('Checklist item not found', 'error');
+        return;
+    }
+    
+    editingChecklistItemId = itemId;
+    
+    const modal = document.getElementById('delete-checklist-item-modal');
+    const itemText = document.getElementById('deleteChecklistItemText');
+    
+    if (modal && itemText) {
+        itemText.textContent = item.content;
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+    }
+}
+
+// Close delete checklist item modal
+function closeDeleteChecklistItemModal() {
+    const modal = document.getElementById('delete-checklist-item-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+    editingChecklistItemId = null;
+}
+
+// Confirm delete checklist item
+async function confirmDeleteChecklistItem() {
+    if (!editingChecklistItemId) return;
+    
+    try {
+        const result = window.db.delete('checklist_items', parseInt(editingChecklistItemId));
+        if (result) {
+            showNotification('Item deleted successfully', 'success');
+            if (window.currentCardId) {
+                loadChecklistItemsInline(window.currentCardId);
+            }
+            closeDeleteChecklistItemModal();
         } else {
             showNotification('Failed to delete item', 'error');
         }
@@ -2967,6 +3085,12 @@ window.cancelAddItem = cancelAddItem;
 window.addChecklistItemInline = addChecklistItemInline;
 window.toggleChecklistItemInline = toggleChecklistItemInline;
 window.deleteChecklistItemInline = deleteChecklistItemInline;
+window.openEditChecklistItemModal = openEditChecklistItemModal;
+window.closeEditChecklistItemModal = closeEditChecklistItemModal;
+window.saveChecklistItemEdit = saveChecklistItemEdit;
+window.openDeleteChecklistItemModal = openDeleteChecklistItemModal;
+window.closeDeleteChecklistItemModal = closeDeleteChecklistItemModal;
+window.confirmDeleteChecklistItem = confirmDeleteChecklistItem;
 window.updateChecklistProgress = updateChecklistProgress;
 window.saveAllCardChanges = saveAllCardChanges;
 window.toggleCardComplete = toggleCardComplete;

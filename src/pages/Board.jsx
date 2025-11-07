@@ -742,6 +742,64 @@ const Board = () => {
         </div>
       </div>
 
+      {/* Edit Checklist Item Modal */}
+      <div id="edit-checklist-item-modal" className="modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Edit Checklist Item</h3>
+            <button className="modal-close" onClick={() => window.closeEditChecklistItemModal && window.closeEditChecklistItemModal()}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="form-group">
+              <label htmlFor="editChecklistItemInput">Item Text</label>
+              <input 
+                type="text" 
+                id="editChecklistItemInput" 
+                className="form-control" 
+                placeholder="Enter item text..." 
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    window.saveChecklistItemEdit && window.saveChecklistItemEdit();
+                  } else if (e.key === 'Escape') {
+                    window.closeEditChecklistItemModal && window.closeEditChecklistItemModal();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <div className="modal-footer">
+            <button className="btn btn-secondary" onClick={() => window.closeEditChecklistItemModal && window.closeEditChecklistItemModal()}>Cancel</button>
+            <button className="btn btn-primary" onClick={() => window.saveChecklistItemEdit && window.saveChecklistItemEdit()}>Save Changes</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Checklist Item Confirmation Modal */}
+      <div id="delete-checklist-item-modal" className="modal delete-confirmation-modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Delete Checklist Item</h3>
+            <button className="modal-close" onClick={() => window.closeDeleteChecklistItemModal && window.closeDeleteChecklistItemModal()}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="confirmation-message">
+              <div className="warning-icon">
+                <i className="fas fa-exclamation-triangle"></i>
+              </div>
+              <div className="message-content">
+                <h4>Delete this checklist item?</h4>
+                <p>Item: "<span id="deleteChecklistItemText"></span>"</p>
+                <p>This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button className="btn btn-danger" onClick={() => window.confirmDeleteChecklistItem && window.confirmDeleteChecklistItem()}>Delete Item</button>
+              <button className="btn btn-secondary" onClick={() => window.closeDeleteChecklistItemModal && window.closeDeleteChecklistItemModal()}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Add more modals as needed - simplified version but include all important ones */}
       
       {/* Board Statistics Modal */}

@@ -481,8 +481,17 @@
 
 .checklist-form-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Form actions for add checklist item inline */
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
 }
 
 .checklist-empty {
@@ -494,16 +503,36 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  align-items: flex-start;
 }
 
 .checklist-items-inline .checklist-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   padding: 0.25rem 0.5rem;
   background: transparent;
   border-radius: var(--border-radius);
   transition: var(--transition);
+  width: 100%;
+  position: relative;
+}
+
+.checklist-items-inline .checklist-item:hover {
+  background: var(--bg-secondary);
+}
+
+.checklist-items-inline .checklist-item .item-actions {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  margin-left: auto;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.checklist-items-inline .checklist-item:hover .item-actions {
+  opacity: 1;
 }
 
 .checklist-items-inline .checklist-item:hover {
@@ -2599,6 +2628,7 @@
 .checklist-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.75rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--bg-secondary);
@@ -6089,4 +6119,58 @@ textarea.card-description:focus {
 
 #delete-label-modal .modal-actions .btn-secondary:hover {
     background: var(--bg-quaternary);
+}
+
+/* Checklist item inline layout */
+.checklist-item-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: transparent;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+    width: 100%;
+}
+
+.checklist-item-inline:hover {
+    background: var(--bg-secondary);
+}
+
+.checklist-item-inline .item-checkbox {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.checklist-item-inline .item-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+
+.checklist-item-inline .item-content .item-text {
+    text-align: left !important;
+    display: inline !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal !important;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    width: 100%;
+}
+
+.checklist-item-inline .item-actions {
+    opacity: 0;
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+    transition: opacity 0.2s ease;
+}
+
+.checklist-item-inline:hover .item-actions {
+    opacity: 1;
 }
