@@ -248,6 +248,12 @@ const Board = () => {
     }
   };
 
+  const showAddListModal = () => {
+    if (window.showAddListModal) {
+      window.showAddListModal();
+    }
+  };
+
   return (
     <div>
       <nav className="navbar">
@@ -289,10 +295,22 @@ const Board = () => {
           <div className="board-title-section">
             <h1 className="board-title" id="boardTitle" data-board-id="1" onClick={editBoardTitle}>
               <span className="title-text" id="boardTitleText">Website Redesign</span>
-              <span className="edit-icon">✏️</span>
+              <i className="fas fa-pencil-alt edit-icon"></i>
             </h1>
             <div className="title-edit-form" style={{display: 'none'}}>
-              <input type="text" id="boardTitleInput" className="form-control" defaultValue="Website Redesign" />
+              <input 
+                type="text" 
+                id="boardTitleInput" 
+                className="form-control" 
+                defaultValue="Website Redesign"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    saveBoardTitle();
+                  } else if (e.key === 'Escape') {
+                    cancelTitleEdit();
+                  }
+                }}
+              />
               <button id="saveTitleBtn" className="btn btn-primary btn-sm" onClick={saveBoardTitle}>Save</button>
               <button id="cancelEditBtn" className="btn btn-secondary btn-sm btn-cancel" onClick={cancelTitleEdit}>Cancel</button>
             </div>
@@ -317,7 +335,15 @@ const Board = () => {
            
             <div id="manila-clock" className="manila-clock" title="Manila (PHT)"></div>
             
-            <button className="invite-btn">
+            <button className="invite-btn" onClick={() => {
+              const modal = document.getElementById('inviteModal');
+              if (modal) {
+                modal.classList.add('active');
+                if (window.initializeInviteModalTabs) {
+                  window.initializeInviteModalTabs();
+                }
+              }
+            }}>
               <i className="fas fa-user-plus"></i>
               Invite
             </button>
@@ -593,6 +619,198 @@ const Board = () => {
               <div id="listProgressContainer">
                 {/* List progress will be populated here */}
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Invite Modal */}
+      <div id="inviteModal" className="modal" style={{zIndex: 9999}}>
+        <div className="modal-content invite-modal-content" style={{zIndex: 10000}}>
+          <div className="modal-header invite-modal-header">
+            <h3>Invite to Board</h3>
+            <span className="close-modal" onClick={() => {
+              const modal = document.getElementById('inviteModal');
+              if (modal) modal.classList.remove('active');
+            }}>&times;</span>
+          </div>
+          <div className="modal-body invite-modal-body">
+            <form id="inviteForm" className="invite-form">
+              <div className="form-group">
+                <label htmlFor="inviteEmail">Email</label>
+                <input type="email" id="inviteEmail" name="email" className="form-control invite-email-input" required placeholder="Enter email address" />
+              </div>
+              <div className="form-group">
+                <label htmlFor="permissionLevel">Permission</label>
+                <select id="permissionLevel" name="permission" className="form-control invite-permission-select" required>
+                  <option value="view">Can view</option>
+                  <option value="edit">Can edit</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div className="form-actions invite-form-actions">
+                <button type="button" className="btn btn-secondary invite-cancel-btn" id="cancelInvite" onClick={() => {
+                  const modal = document.getElementById('inviteModal');
+                  if (modal) modal.classList.remove('active');
+                }}>Cancel</button>
+                <button type="submit" className="btn btn-primary invite-send-btn">Send Invitation</button>
+              </div>
+            </form>
+
+            {/* Tabbed Board Management Section */}
+            <div className="board-management invite-board-management">
+              <div className="tab-header invite-tab-header">
+                <button className="tab-btn invite-tab-btn active" data-tab="members">
+                  <span className="tab-text">Board members</span>
+                  <span className="tab-count">5</span>
+                </button>
+                <button className="tab-btn invite-tab-btn" data-tab="requests">
+                  <span className="tab-text">Join requests</span>
+                  <span className="tab-count">2</span>
+                </button>
+              </div>
+              
+              <div className="tab-content invite-tab-content">
+                {/* Board Members Tab */}
+                <div id="membersTab" className="tab-panel invite-tab-panel active">
+                  <div id="boardMembersList" className="members-list invite-members-list">
+                    {/* Board members */}
+                    <div className="member-item">
+                      <div className="member-avatar" style={{background: '#0079bf'}}>LT</div>
+                      <div className="member-info">
+                        <div className="member-name">Luc Trevecedo</div>
+                        <div className="member-role">Admin • luc@gmail.com</div>
+                      </div>
+                      <div className="member-status">Owner</div>
+                    </div>
+                    <div className="member-item">
+                      <div className="member-avatar" style={{background: '#61bd4f'}}>PR</div>
+                      <div className="member-info">
+                        <div className="member-name">Paolo Rayos</div>
+                        <div className="member-role">Can edit • paolo@gmail.com</div>
+                      </div>
+                      <div className="member-actions">
+                        <select className="member-permission-select">
+                          <option value="edit" selected>Can edit</option>
+                          <option value="view">Can view</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        <button className="btn btn-danger btn-sm member-remove-btn">Remove</button>
+                      </div>
+                    </div>
+                    <div className="member-item">
+                      <div className="member-avatar" style={{background: '#eb5a46'}}>NA</div>
+                      <div className="member-info">
+                        <div className="member-name">Nathaniel Andrada</div>
+                        <div className="member-role">Can edit • nathaniel@gmail.com</div>
+                      </div>
+                      <div className="member-actions">
+                        <select className="member-permission-select">
+                          <option value="edit" selected>Can edit</option>
+                          <option value="view">Can view</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        <button className="btn btn-danger btn-sm member-remove-btn">Remove</button>
+                      </div>
+                    </div>
+                    <div className="member-item">
+                      <div className="member-avatar" style={{background: '#f2d600'}}>ES</div>
+                      <div className="member-info">
+                        <div className="member-name">Elijah Sintor</div>
+                        <div className="member-role">Can view • elijah@gmail.com</div>
+                      </div>
+                      <div className="member-actions">
+                        <select className="member-permission-select">
+                          <option value="view" selected>Can view</option>
+                          <option value="edit">Can edit</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        <button className="btn btn-danger btn-sm member-remove-btn">Remove</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Join Requests Tab */}
+                <div id="requestsTab" className="tab-panel invite-tab-panel">
+                  <div id="joinRequestsList" className="requests-list invite-requests-list">
+                    <div className="request-item">
+                      <div className="request-avatar" style={{background: '#c377e0'}}>AL</div>
+                      <div className="request-info">
+                        <div className="request-name">Andrew Llego</div>
+                        <div className="request-email">andrew@gmail.com</div>
+                        <div className="request-message">"I'd like to contribute to this project"</div>
+                        <div className="request-date">Requested 2 hours ago</div>
+                      </div>
+                      <div className="request-actions">
+                        <button className="btn btn-success btn-sm">Accept</button>
+                        <button className="btn btn-danger btn-sm">Decline</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Add List Modal */}
+      <div id="addListModal" className="modal">
+        <div className="modal-content add-list-modal-content">
+          <div className="modal-header">
+            <h3>Add List</h3>
+            <span className="close-modal" onClick={closeAddListModal}>&times;</span>
+          </div>
+          <div className="modal-body">
+            <form id="addListForm" onSubmit={handleAddListSubmit}>
+              <div className="form-group">
+                <label htmlFor="listTitle">List Title</label>
+                <input 
+                  type="text" 
+                  id="listTitle" 
+                  name="title" 
+                  className="form-control" 
+                  required 
+                  placeholder="Enter list title" 
+                  maxLength="100"
+                />
+              </div>
+              <div className="form-actions">
+                <button type="button" className="btn btn-secondary" onClick={closeAddListModal}>Cancel</button>
+                <button type="submit" className="btn btn-primary">Add List</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      {/* Success Invitation Modal */}
+      <div id="invitationSuccessModal" className="modal">
+        <div className="modal-content success-modal-content">
+          <div className="modal-body success-modal-body">
+            <div className="success-icon">
+              <i className="fas fa-check-circle"></i>
+            </div>
+            <h3>Invitation Sent!</h3>
+            <p>The invitation has been sent successfully. The user will receive an email with instructions to join the board.</p>
+            <button className="btn btn-primary success-ok-btn" onClick={closeInvitationSuccessModal}>OK</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Remove Member Confirmation Modal */}
+      <div id="removeMemberModal" className="modal">
+        <div className="modal-content confirm-modal-content">
+          <div className="modal-body confirm-modal-body">
+            <div className="warning-icon">
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Remove Member</h3>
+            <p>Are you sure you want to remove <span id="memberToRemoveName"></span> from this board? This action cannot be undone.</p>
+            <div className="confirm-actions">
+              <button className="btn btn-secondary" onClick={closeRemoveMemberModal}>Cancel</button>
+              <button className="btn btn-danger" onClick={confirmRemoveMember}>Remove</button>
             </div>
           </div>
         </div>

@@ -2718,17 +2718,52 @@ function getCountdownStatusClass(dueDateString, isCompleted = false) {
     }
 }
 
-// Placeholder functions for board title editing
+// Board title editing functions
 function editBoardTitle() {
-    console.log("Edit board title clicked");
+    const titleSection = document.querySelector('.board-title-section');
+    const titleText = document.getElementById('boardTitleText');
+    const titleEditForm = document.querySelector('.title-edit-form');
+    const titleInput = document.getElementById('boardTitleInput');
+    
+    if (titleSection && titleText && titleEditForm && titleInput) {
+        titleText.style.display = 'none';
+        titleEditForm.style.display = 'flex';
+        titleInput.value = titleText.textContent;
+        titleInput.focus();
+        titleInput.select();
+    }
 }
 
 function saveBoardTitle() {
-    console.log("Save board title clicked");
+    const titleText = document.getElementById('boardTitleText');
+    const titleEditForm = document.querySelector('.title-edit-form');
+    const titleInput = document.getElementById('boardTitleInput');
+    const boardTitle = document.getElementById('boardTitle');
+    
+    if (titleText && titleEditForm && titleInput && boardTitle) {
+        const newTitle = titleInput.value.trim();
+        if (newTitle) {
+            titleText.textContent = newTitle;
+            
+            // Update in database
+            const boardId = boardTitle.getAttribute('data-board-id');
+            if (window.db && boardId) {
+                window.db.update('boards', parseInt(boardId), { title: newTitle });
+            }
+        }
+        
+        cancelTitleEdit();
+    }
 }
 
 function cancelTitleEdit() {
-    console.log("Cancel title edit clicked");
+    const titleText = document.getElementById('boardTitleText');
+    const titleEditForm = document.querySelector('.title-edit-form');
+    
+    if (titleText && titleEditForm) {
+        titleText.style.display = 'inline';
+        titleEditForm.style.display = 'none';
+    }
 }
 
 function showBoardStatistics() {
@@ -3360,9 +3395,38 @@ function initializeInviteModalTabs() {
             }
         });
     });
+    
+    // Handle form submission
+    const inviteForm = document.getElementById('inviteForm');
+    if (inviteForm) {
+        inviteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('inviteEmail').value;
+            const permission = document.getElementById('permissionLevel').value;
+            
+            if (email) {
+                // Show success message
+                if (window.showNotification) {
+                    window.showNotification(`Invitation sent to ${email}`, 'success');
+                }
+                
+                // Close modal
+                const modal = document.getElementById('inviteModal');
+                if (modal) {
+                    modal.classList.remove('active');
+                }
+                
+                // Reset form
+                this.reset();
+            }
+        });
+    }
 }
 
-// Initialize invite modal tabs when modal opens
+// Make function globally available
+window.initializeInviteModalTabs = initializeInviteModalTabs;
+
 const originalInviteModalSetup = () => {
     const inviteBtn = document.querySelector('.invite-btn');
     const inviteModal = document.getElementById('inviteModal');

@@ -836,6 +836,85 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.board-title:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.board-title .edit-icon {
+  font-size: 1rem;
+  color: white;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.board-title:hover .edit-icon {
+  opacity: 1;
+}
+
+.title-edit-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+  backdrop-filter: blur(10px);
+}
+
+.title-edit-form #boardTitleInput {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #0079bf;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #172b4d;
+  outline: none;
+  min-width: 200px;
+}
+
+.title-edit-form #boardTitleInput:focus {
+  border-color: #026aa7;
+  box-shadow: 0 0 0 3px rgba(0, 121, 191, 0.1);
+}
+
+.title-edit-form .btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.title-edit-form .btn-primary {
+  background: #0079bf;
+  color: white;
+}
+
+.title-edit-form .btn-primary:hover {
+  background: #026aa7;
+  transform: translateY(-1px);
+}
+
+.title-edit-form .btn-secondary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.title-edit-form .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .board-visibility {
