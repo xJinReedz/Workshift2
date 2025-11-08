@@ -1382,6 +1382,9 @@ function connectToGoogle() {
     showNotification('Successfully connected to Google Calendar!', 'success');
 }
 
+// Make function globally available
+window.connectToGoogle = connectToGoogle;
+
 function disconnectFromGoogle() {
     // Simulate disconnection for demo purposes
     isGoogleSignedIn = false;
@@ -1572,36 +1575,66 @@ function toggleAutoSync() {
 }
 
 // Event Listeners for Google Calendar sync
-document.addEventListener('DOMContentLoaded', function() {
+let googleSyncInitialized = false;
+
+function initializeGoogleSync() {
+    // Prevent multiple initialization
+    if (googleSyncInitialized) {
+        return;
+    }
+    
+    googleSyncInitialized = true;
+    
     // Initialize simulated Google API when page loads
     setTimeout(initializeGoogleAPI, 1000);
     
+    attachGoogleSyncEventListeners();
+}
+
+// Make function globally available
+window.attachGoogleSyncEventListeners = attachGoogleSyncEventListeners;
+
+function attachGoogleSyncEventListeners() {
     // Connect to Google button
     const connectBtn = document.getElementById('connect-google-btn');
     if (connectBtn) {
+        // Remove existing listener to prevent duplicates
+        connectBtn.removeEventListener('click', connectToGoogle);
         connectBtn.addEventListener('click', connectToGoogle);
     }
     
     // Disconnect button
     const disconnectBtn = document.getElementById('disconnect-btn');
     if (disconnectBtn) {
+        disconnectBtn.removeEventListener('click', disconnectFromGoogle);
         disconnectBtn.addEventListener('click', disconnectFromGoogle);
     }
     
     // Auto sync toggle button
     const autoSyncToggle = document.getElementById('auto-sync-toggle');
     if (autoSyncToggle) {
+        autoSyncToggle.removeEventListener('click', toggleAutoSync);
         autoSyncToggle.addEventListener('click', toggleAutoSync);
     }
     
     // Save sync settings button
     const saveSettingsBtn = document.getElementById('save-sync-settings');
     if (saveSettingsBtn) {
-        saveSettingsBtn.addEventListener('click', function() {
+        const saveHandler = function() {
             showNotification('Sync settings saved!', 'success');
             closeModal(document.getElementById('google-sync-modal'));
-        });
+        };
+        saveSettingsBtn.removeEventListener('click', saveHandler);
+        saveSettingsBtn.addEventListener('click', saveHandler);
     }
+}
+
+// Make function available globally for React components
+window.initializeGoogleSync = initializeGoogleSync;
+
+// Fallback DOM event listener (for non-React usage)
+document.addEventListener('DOMContentLoaded', function() {
+    initializeGoogleSync();
 });
 
 // Calendar Deadline Validation Functions

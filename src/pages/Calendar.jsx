@@ -18,6 +18,10 @@ const Calendar = () => {
           if (window.initializeCalendar) {
             window.initializeCalendar();
           }
+          // Initialize Google sync functionality
+          if (window.initializeGoogleSync) {
+            window.initializeGoogleSync();
+          }
         } catch (error) {
           console.warn('Calendar initialization error:', error);
         }
@@ -41,6 +45,15 @@ const Calendar = () => {
   const openModal = (modalId) => {
     if (window.openModal) {
       window.openModal(modalId);
+      
+      // If this is the Google sync modal, ensure event listeners are attached
+      if (modalId === 'google-sync-modal') {
+        setTimeout(() => {
+          if (window.attachGoogleSyncEventListeners) {
+            window.attachGoogleSyncEventListeners();
+          }
+        }, 100);
+      }
     }
   };
 
@@ -429,7 +442,7 @@ const Calendar = () => {
           </div>
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={() => closeModal(document.getElementById('google-sync-modal'))}>Cancel</button>
-            <button type="button" className="btn btn-primary" id="connect-google-btn">
+            <button type="button" className="btn btn-primary" id="connect-google-btn" onClick={() => window.connectToGoogle && window.connectToGoogle()}>
               <i className="fab fa-google"></i> Connect to Google
             </button>
             <button type="button" className="btn btn-primary" id="save-sync-settings" style={{display: 'none'}}>

@@ -181,6 +181,22 @@
   border-radius: 0 !important;
 }
 
+/* Ensure modals always appear above navigation, especially on mobile */
+.modal {
+  z-index: 1100 !important;
+}
+
+.modal.active {
+  z-index: 1100 !important;
+}
+
+/* Mobile navigation should stay behind modals */
+@media (max-width: 768px) {
+  .navbar-nav {
+    z-index: 999 !important;
+  }
+}
+
 .success-content {
   text-align: center;
 }
