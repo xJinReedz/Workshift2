@@ -143,7 +143,7 @@ const Dashboard = () => {
                   </div>
                   <div className="activity-content">
                     <div className="activity-text">
-                      <strong>Paolo Rayos</strong> added a card to 
+                      <strong>Paolo Rayos</strong> added a card to{' '}
                       <span className="activity-board">Mobile App Development</span>
                     </div>
                     <div className="activity-time">2 hours ago</div>
@@ -155,7 +155,7 @@ const Dashboard = () => {
                   </div>
                   <div className="activity-content">
                     <div className="activity-text">
-                      <strong>Luc Trevecedo</strong> completed a task in 
+                      <strong>Luc Trevecedo</strong> completed a task in{' '}
                       <span className="activity-board">Website Redesign</span>
                     </div>
                     <div className="activity-time">4 hours ago</div>
@@ -167,7 +167,7 @@ const Dashboard = () => {
                   </div>
                   <div className="activity-content">
                     <div className="activity-text">
-                      <strong>Nathaniel Andrada</strong> commented on a card in 
+                      <strong>Nathaniel Andrada</strong> commented on a card in{' '}
                       <span className="activity-board">Marketing Campaign Q1</span>
                     </div>
                     <div className="activity-time">1 day ago</div>
@@ -185,7 +185,7 @@ const Dashboard = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h3>Create New Board</h3>
-            <button className="modal-close">&times;</button>
+            <button className="modal-close" onClick={() => window.closeModal && window.closeModal(document.getElementById('create-board-modal'))}>&times;</button>
           </div>
           <div className="modal-body">
             <form id="create-board-form">
@@ -211,7 +211,7 @@ const Dashboard = () => {
             </form>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary">Cancel</button>
+            <button type="button" className="btn btn-secondary" onClick={() => window.closeModal && window.closeModal(document.getElementById('create-board-modal'))}>Cancel</button>
             <button type="submit" className="btn btn-primary" form="create-board-form">Create Board</button>
           </div>
         </div>
@@ -222,7 +222,7 @@ const Dashboard = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h3>Choose Template</h3>
-            <button className="modal-close">&times;</button>
+            <button className="modal-close" onClick={() => window.closeModal && window.closeModal(document.getElementById('template-modal'))}>&times;</button>
           </div>
           <div className="modal-body">
             <p className="text-muted mb-4">Start with a template to get your board set up quickly.</p>
@@ -257,7 +257,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary">Cancel</button>
+            <button type="button" className="btn btn-secondary" onClick={() => window.closeModal && window.closeModal(document.getElementById('template-modal'))}>Cancel</button>
             <button type="button" className="btn btn-primary">Use Template</button>
           </div>
         </div>
@@ -268,7 +268,7 @@ const Dashboard = () => {
         <div className="modal-content">
           <div className="modal-header">
             <h3><i className="fas fa-exclamation-triangle" style={{color: 'var(--danger-color)'}}></i> Delete Board</h3>
-            <button className="modal-close">&times;</button>
+            <button className="modal-close" onClick={() => window.closeModal && window.closeModal(document.getElementById('delete-board-modal'))}>&times;</button>
           </div>
           <div className="modal-body">
             <p>Are you sure you want to delete the board <strong id="board-name-to-delete"></strong>?</p>
@@ -277,8 +277,8 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary">Cancel</button>
-            <button type="button" className="btn btn-danger" id="confirm-delete-board">
+            <button type="button" className="btn btn-secondary" onClick={() => window.closeModal && window.closeModal(document.getElementById('delete-board-modal'))}>Cancel</button>
+            <button type="button" className="btn btn-danger" id="confirm-delete-board" onClick={() => window.deleteBoard && window.deleteBoard()}>
               <i className="fas fa-trash"></i> Delete Board
             </button>
           </div>

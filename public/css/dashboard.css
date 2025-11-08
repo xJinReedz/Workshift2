@@ -93,6 +93,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  text-align: left;
 }
 
 .board-title {
@@ -101,6 +102,7 @@
   color: var(--text-primary);
   margin-bottom: 0.5rem;
   line-height: 1.3;
+  text-align: left;
 }
 
 .board-description {
@@ -109,6 +111,7 @@
   line-height: 1.4;
   margin-bottom: 1rem;
   flex: 1;
+  text-align: left;
 }
 
 .board-meta {
@@ -215,23 +218,47 @@
   border-radius: var(--border-radius-lg);
   padding: 1.5rem;
   box-shadow: var(--shadow-sm);
+  text-align: left;
 }
 
 .recent-activity h3 {
   margin-bottom: 1.5rem;
   color: var(--text-primary);
+  text-align: left;
 }
 
 .activity-list {
   list-style: none;
+  text-align: left;
 }
 
 .activity-item {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem 0;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
   border-bottom: 1px solid var(--bg-secondary);
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.activity-item:focus,
+.activity-item:active {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.activity-item:hover {
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  margin: 0 -0.5rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 .activity-item:last-child {
@@ -240,26 +267,41 @@
 
 .activity-avatar {
   flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.activity-avatar .avatar {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .activity-content {
   flex: 1;
+  text-align: left;
 }
 
 .activity-text {
   color: var(--text-primary);
   line-height: 1.4;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
 }
 
 .activity-time {
   color: var(--text-light);
   font-size: 0.75rem;
+  text-align: left;
 }
 
 .activity-board {
   color: var(--primary-color);
   font-weight: 500;
+  text-decoration: none;
+}
+
+.activity-board:hover {
+  text-decoration: underline;
 }
 
 /* Quick Actions */
@@ -308,6 +350,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  text-align: left;
 }
 
 /* Starred Boards */
@@ -316,10 +359,12 @@
   border-radius: var(--border-radius-lg);
   padding: 1.5rem;
   box-shadow: var(--shadow-sm);
+  text-align: left;
 }
 
 .starred-boards h3 {
   margin-bottom: 1rem;
+  text-align: left;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -473,6 +518,7 @@
   
   .board-description {
     font-size: 0.8rem;
+    text-align: left;
   }
   
   .create-new-content {

@@ -18,6 +18,31 @@ function closeModal(modal) {
     }
 }
 
+// Setup modal event handlers
+function setupModalEventHandlers() {
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal') && e.target.classList.contains('active')) {
+            closeModal(e.target);
+        }
+    });
+
+    // Close modal with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const activeModal = document.querySelector('.modal.active');
+            if (activeModal) {
+                closeModal(activeModal);
+            }
+        }
+    });
+}
+
+// Make functions available globally
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.setupModalEventHandlers = setupModalEventHandlers;
+
 // Removed auto-initialization - React components will call these functions manually
 // document.addEventListener('DOMContentLoaded', function() {
 //     initializeDashboard();
@@ -30,10 +55,12 @@ function initializeDashboard() {
     initializeTemplateSelection();
     initializeProfileDropdown();
     updateRecentActivity();
+    setupModalEventHandlers();
 }
 
 // Make function available globally
 window.initializeDashboard = initializeDashboard;
+window.loadBoards = loadBoards;
 
 // Load boards from database
 async function loadBoards() {

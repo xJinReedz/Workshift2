@@ -450,6 +450,9 @@ h6 { font-size: 0.875rem; }
   justify-content: center;
   font-weight: 600;
   font-size: 0.875rem;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .avatar-sm {
@@ -462,6 +465,16 @@ h6 { font-size: 0.875rem; }
   width: 48px;
   height: 48px;
   font-size: 1.125rem;
+}
+
+/* Remove any borders from avatars in buttons or clickable contexts */
+button .avatar,
+.avatar:focus,
+.avatar:active,
+a .avatar {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* Modal */
