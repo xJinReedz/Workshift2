@@ -233,7 +233,7 @@ function renderLists() {
                 }
 
                 return `
-                    <div class="card-item" data-card-id="${card.id}" onclick="openCardModal(${card.id})" style="cursor: pointer;">
+                    <div class="card-item" data-card-id="${card.id}">
                         ${labelsHtml}
                         <div class="card-title">${escapeHtml(card.title)}</div>
                         ${card.description ? `<div class="card-description">${escapeHtml(card.description.length > 80 ? card.description.substring(0, 80) + '...' : card.description)}</div>` : ''}
@@ -307,6 +307,7 @@ function initializeBoardInteractions() {
     initializeAddCardForms();
     initializeListMenus();
     initializeBoardTitleEditing();
+    initializeDragAndDrop(); // Enable drag and drop for cards
     startManilaClock();
     
     // Start countdown timers for due dates
@@ -321,20 +322,289 @@ function initializeCardClicks() {
     cards.forEach(card => {
         card.removeEventListener('click', cardClickHandler);
         card.addEventListener('click', cardClickHandler);
-        card.style.cursor = 'pointer';
+        // Don't set cursor here - let drag initialization handle it
     });
 }
 
-// Card click handler
+// Card click handler - modified to work with drag
 function cardClickHandler(e) {
-    e.preventDefault();
-    e.stopPropagation();
+    // Don't prevent default or stop propagation - let drag events work
     const cardId = this.getAttribute('data-card-id');
-    if (cardId) {
-        openCardModal(parseInt(cardId));
-    } else {
-        console.error('No card ID found on clicked element');
+    
+    // Use a small delay to distinguish click from drag start
+    setTimeout(() => {
+        if (!this.classList.contains('dragging')) {
+            if (cardId) {
+                openCardModal(parseInt(cardId));
+            } else {
+                console.error('No card ID found on clicked element');
+            }
+        }
+    }, 100);
+}
+
+// Initialize drag and drop for cards
+function initializeDragAndDrop() {
+    console.log('🔥 Initializing drag and drop');
+    
+    const cards = document.querySelectorAll('.card-item');
+    console.log(`Found ${cards.length} cards to make draggable`);
+    
+    cards.forEach(card => {
+        // Make card draggable
+        card.setAttribute('draggable', 'true');
+        card.style.cursor = 'grab';
+        
+        // Remove any existing event listeners to avoid conflicts
+        card.removeEventListener('dragstart', handleDragStart);
+        card.removeEventListener('dragend', handleDragEnd);
+        
+        // Add drag event listeners
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+        
+        console.log('✓ Card', card.dataset.cardId, 'is now draggable');
+    });
+    
+    // Setup drop zones on lists (using actual class name from HTML)
+    const listBodies = document.querySelectorAll('.list-body');
+    console.log(`Setting up ${listBodies.length} drop zones on .list-body elements`);
+    
+    listBodies.forEach(listBody => {
+        listBody.addEventListener('dragover', handleDragOver);
+        listBody.addEventListener('dragenter', handleDragEnter);
+        listBody.addEventListener('dragleave', handleDragLeave);
+        listBody.addEventListener('drop', handleDrop);
+        
+        console.log('✓ Drop zone set up on:', listBody);
+    });
+    
+    console.log('✅ Drag and drop initialized successfully');
+}
+
+let draggedCard = null;
+let sourceListId = null;
+
+// Handle drag start
+function handleDragStart(e) {
+    console.log('🚀 DRAG START EVENT FIRED!', {
+        cardId: this.dataset.cardId,
+        element: this
+    });
+    
+    draggedCard = this;
+    sourceListId = this.closest('.list').dataset.listId;
+    
+    this.classList.add('dragging');
+    this.style.cursor = 'grabbing';
+    
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.dataset.cardId);
+    
+    console.log('✅ Drag data set:', {
+        cardId: this.dataset.cardId,
+        sourceListId: sourceListId
+    });
+}
+
+// Handle drag end
+function handleDragEnd(e) {
+    this.classList.remove('dragging');
+    this.style.cursor = 'grab';
+    
+    // Remove all drag-over classes
+    document.querySelectorAll('.list-cards').forEach(list => {
+        list.classList.remove('drag-over');
+    });
+    
+    console.log('🏁 Drag ended');
+    draggedCard = null;
+    sourceListId = null;
+}
+
+// Handle drag over
+function handleDragOver(e) {
+    console.log('🔄 Drag over detected on:', this);
+    if (e.preventDefault) {
+        e.preventDefault(); // Allows drop
     }
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+// Handle drag enter
+function handleDragEnter(e) {
+    console.log('➡️ Drag enter on:', this);
+    this.classList.add('drag-over');
+}
+
+// Handle drag leave
+function handleDragLeave(e) {
+    console.log('⬅️ Drag leave from:', this);
+    // Only remove if we're leaving the list, not a child element
+    if (e.target === this) {
+        this.classList.remove('drag-over');
+    }
+}
+
+// Handle drop
+async function handleDrop(e) {
+    console.log('🎯 DROP EVENT TRIGGERED on:', this);
+    if (e.stopPropagation) {
+        e.stopPropagation(); // Stops browser from redirecting
+    }
+    e.preventDefault();
+    
+    this.classList.remove('drag-over');
+    
+    if (!draggedCard) {
+        console.warn('No dragged card found');
+        return false;
+    }
+    
+    const targetList = this.closest('.list');
+    const targetListId = targetList.dataset.listId;
+    const cardId = draggedCard.dataset.cardId;
+    
+    console.log('📥 Drop:', {
+        cardId: cardId,
+        fromList: sourceListId,
+        toList: targetListId
+    });
+    
+    // Don't do anything if dropped in same list
+    if (sourceListId === targetListId) {
+        console.log('Dropped in same list, no action needed');
+        return false;
+    }
+    
+    try {
+        // Update card's list_id in database
+        if (window.api && window.api.updateCard) {
+            const response = await window.api.updateCard({
+                card_id: parseInt(cardId),
+                list_id: parseInt(targetListId)
+            });
+            
+            if (response.success) {
+                console.log('✅ Card moved to new list in database');
+                // Refresh the board
+                await renderLists();
+                showNotification('Card moved successfully!', 'success');
+            } else {
+                console.error('API returned error:', response);
+                showNotification('Failed to move card: ' + (response.error || 'Unknown error'), 'error');
+            }
+        } else if (window.db) {
+            await window.db.update('cards', parseInt(cardId), { list_id: parseInt(targetListId) });
+            console.log('✅ Card moved to new list in local database');
+            // Refresh the board
+            await renderLists();
+            showNotification('Card moved successfully!', 'success');
+        }
+    } catch (error) {
+        console.error('Error moving card:', error);
+        showNotification('Failed to move card: ' + error.message, 'error');
+    }
+    
+    return false;
+}
+
+// Reset board to have only To Do list with test cards
+function resetToDoOnlyBoard() {
+    console.log('🔄 Resetting board to To Do only...');
+    
+    // Create test data structure
+    const testBoard = {
+        id: 1,
+        title: "Test Board",
+        lists: [
+            {
+                id: 1,
+                title: "To Do",
+                board_id: 1,
+                cards: [
+                    { id: 1, title: "Test Card 1", description: "Drag me!", list_id: 1 },
+                    { id: 2, title: "Test Card 2", description: "Or drag me!", list_id: 1 },
+                    { id: 3, title: "Test Card 3", description: "I'm draggable too!", list_id: 1 }
+                ]
+            },
+            {
+                id: 2,
+                title: "In Progress",
+                board_id: 1,
+                cards: []
+            }
+        ]
+    };
+    
+    // Render this test board using correct HTML structure
+    const boardContainer = document.querySelector('.board-lists');
+    if (boardContainer) {
+        const listsHtml = testBoard.lists.map(list => `
+            <div class="list" data-list-id="${list.id}">
+                <div class="list-header">
+                    <h3>${list.title}</h3>
+                </div>
+                <div class="list-body" id="list-${list.id}-cards">
+                    ${list.cards.map(card => `
+                        <div class="card-item" data-card-id="${card.id}">
+                            <div class="card-title">${card.title}</div>
+                            <div class="card-description">${card.description}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+        
+        boardContainer.innerHTML = listsHtml;
+        
+        // Re-initialize drag and drop
+        initializeDragAndDrop();
+        initializeCardClicks();
+        
+        console.log('✅ Test board created with draggable cards!');
+    }
+}
+
+// Debug function to test drag functionality
+function testDragFunctionality() {
+    console.log('🔍 Testing drag functionality...');
+    
+    const cards = document.querySelectorAll('.card-item');
+    console.log(`Found ${cards.length} cards`);
+    
+    cards.forEach((card, index) => {
+        console.log(`Card ${index + 1}:`, {
+            id: card.dataset.cardId,
+            draggable: card.getAttribute('draggable'),
+            cursor: window.getComputedStyle(card).cursor,
+            userSelect: window.getComputedStyle(card).userSelect
+        });
+    });
+    
+    // Test drop zones
+    const dropZones = document.querySelectorAll('.list-body');
+    console.log(`\nFound ${dropZones.length} drop zones (.list-body)`);
+    
+    dropZones.forEach((zone, index) => {
+        const parentList = zone.closest('.list');
+        console.log(`Drop Zone ${index + 1}:`, {
+            listId: parentList ? parentList.dataset.listId : 'No parent list',
+            className: zone.className,
+            id: zone.id
+        });
+    });
+    
+    // Check if lists exist
+    const lists = document.querySelectorAll('.list');
+    console.log(`\nFound ${lists.length} lists (.list)`);
+    lists.forEach((list, index) => {
+        console.log(`List ${index + 1}:`, {
+            listId: list.dataset.listId,
+            title: list.querySelector('h3')?.textContent || 'No title'
+        });
+    });
 }
 
 // Open card modal and load card details
