@@ -344,42 +344,43 @@ async function toggleStar(button, boardId) {
 // Make function available globally
 window.toggleStar = toggleStar;
 
-// Profile dropdown
+// Profile dropdown - Modified to not conflict with React onClick handlers
 function initializeProfileDropdown() {
-    const profileDropdown = document.querySelector('.profile-dropdown');
     const profileMenu = document.getElementById('profile-menu');
     
-    if (profileDropdown && profileMenu) {
-        // Position dropdown
-        profileDropdown.style.position = 'relative';
-        
-        // Show/hide dropdown
-        profileDropdown.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const isActive = profileMenu.classList.contains('active');
-            
-            if (isActive) {
-                profileMenu.style.opacity = '0';
-                profileMenu.style.visibility = 'hidden';
-                profileMenu.style.transform = 'translateY(-10px)';
-                profileMenu.classList.remove('active');
-            } else {
-                profileMenu.style.opacity = '1';
-                profileMenu.style.visibility = 'visible';
-                profileMenu.style.transform = 'translateY(0)';
-                profileMenu.classList.add('active');
-            }
-        });
-        
+    if (profileMenu) {
         // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-            if (profileMenu.classList.contains('active')) {
-                profileMenu.style.opacity = '0';
-                profileMenu.style.visibility = 'hidden';
-                profileMenu.style.transform = 'translateY(-10px)';
-                profileMenu.classList.remove('active');
+        document.addEventListener('click', function(e) {
+            // Only close if click is outside both profile dropdown and profile menu
+            if (!e.target.closest('.profile-dropdown') && !e.target.closest('#profile-menu')) {
+                if (profileMenu.classList.contains('active')) {
+                    profileMenu.style.opacity = '0';
+                    profileMenu.style.visibility = 'hidden';
+                    profileMenu.style.transform = 'translateY(-10px)';
+                    profileMenu.classList.remove('active');
+                }
             }
         });
+    }
+}
+
+// Add function to show profile dropdown (can be called from React if needed)
+function toggleProfileDropdown() {
+    const profileMenu = document.getElementById('profile-menu');
+    if (profileMenu) {
+        const isActive = profileMenu.classList.contains('active');
+        
+        if (isActive) {
+            profileMenu.style.opacity = '0';
+            profileMenu.style.visibility = 'hidden';
+            profileMenu.style.transform = 'translateY(-10px)';
+            profileMenu.classList.remove('active');
+        } else {
+            profileMenu.style.opacity = '1';
+            profileMenu.style.visibility = 'visible';
+            profileMenu.style.transform = 'translateY(0)';
+            profileMenu.classList.add('active');
+        }
     }
 }
 
@@ -563,8 +564,9 @@ async function deleteBoard() {
     }
 }
 
-// Make function available globally
+// Make functions available globally
 window.deleteBoard = deleteBoard;
+window.toggleProfileDropdown = toggleProfileDropdown;
 
 // Override the shared search function for dashboard-specific behavior
 if (window.WorkShift) {

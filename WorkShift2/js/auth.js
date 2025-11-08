@@ -21,7 +21,7 @@ function initializeLoginForm() {
     initializePasswordToggle();
     
     // Pre-fill demo credentials
-    emailInput.value = 'john@gmail.com';
+    emailInput.value = 'luc@gmail.com';
     passwordInput.value = 'workshift123@@';
 }
 
@@ -500,9 +500,9 @@ function fillDemoData() {
     const currentPage = window.location.pathname.split('/').pop();
     
     if (currentPage === 'register.php') {
-        document.getElementById('firstName').value = 'John';
-        document.getElementById('lastName').value = 'Doe';
-        document.getElementById('email').value = 'john.doe@example.com';
+        document.getElementById('firstName').value = 'Luc';
+        document.getElementById('lastName').value = 'Trevecedo';
+        document.getElementById('email').value = 'luc@gmail.com';
         document.getElementById('password').value = 'SecurePass123!';
         document.getElementById('confirmPassword').value = 'SecurePass123!';
         document.getElementById('terms').checked = true;

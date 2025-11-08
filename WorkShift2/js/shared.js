@@ -442,7 +442,7 @@ function openProfileModal() {
                     
                     <div class="form-group">
                         <label for="profile-email">Email Address</label>
-                        <input type="email" id="profile-email" class="form-input" value="john.doe@workshift.com" placeholder="Enter your email">
+                        <input type="email" id="profile-email" class="form-input" value="luc@gmail.com" placeholder="Enter your email">
                     </div>
                     
                     <div class="form-group">

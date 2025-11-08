@@ -445,7 +445,7 @@ function openProfileModal() {
                     
                     <div class="form-group">
                         <label for="profile-email">Email Address</label>
-                        <input type="email" id="profile-email" class="form-input" value="john.doe@workshift.com" placeholder="Enter your email">
+                        <input type="email" id="profile-email" class="form-input" value="luc@gmail.com" placeholder="Enter your email">
                     </div>
                     
                     <div class="form-group">
@@ -554,8 +554,8 @@ window.WorkShift = {
     handleLogout
 };
 
-// Make handleLogout globally available
+// Make functions globally available
 window.handleLogout = handleLogout;
-
-// Make showNotification globally available
 window.showNotification = showNotification;
+window.openProfileModal = openProfileModal;
+window.saveProfileChanges = saveProfileChanges;
