@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -97,7 +97,27 @@ const Login = () => {
   }, [navigate]);
 
   const handleSocialLogin = (provider) => {
-    window.handleSocialLogin(provider);
+    // Simulate successful Google login and redirect to board
+    if (provider === 'google') {
+      // Set authentication state
+      if (window.api) {
+        window.api.currentUser = {
+          id: 1,
+          email: 'user@gmail.com',
+          name: 'Google User'
+        };
+        
+        // Save session
+        localStorage.setItem('workshift_user', JSON.stringify({
+          email: 'user@gmail.com',
+          name: 'Google User',
+          avatar: 'GU'
+        }));
+      }
+      
+      // Navigate to board
+      navigate('/');
+    }
   };
 
   const togglePasswordVisibility = () => {
@@ -172,7 +192,7 @@ const Login = () => {
             <input type="checkbox" id="remember" name="remember" />
             <label htmlFor="remember">Remember me</label>
             <div style={{marginLeft: 'auto'}}>
-              <a href="forgot-password.html">Forgot password?</a>
+              <Link to="/forgot-password">Forgot password?</Link>
             </div>
           </div>
 
@@ -194,7 +214,7 @@ const Login = () => {
 
         <div className="auth-footer">
           <p className="auth-footer-text">Don't have an account?</p>
-          <a href="register.html" className="auth-footer-link">Create an account</a>
+          <Link to="/register" className="auth-footer-link">Create an account</Link>
         </div>
       </div>
     </div>

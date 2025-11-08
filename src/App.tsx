@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Board from './pages/Board';
 import Calendar from './pages/Calendar';
@@ -16,6 +18,8 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/board/:boardId" element={<Board />} />
           <Route path="/calendar" element={<Calendar />} />

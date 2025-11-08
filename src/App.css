@@ -2,6 +2,70 @@
   text-align: center;
 }
 
+/* Custom styles for button links */
+.link-button {
+  background: none;
+  border: none;
+  color: var(--primary-color, #0079bf);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+}
+
+.link-button:hover {
+  text-decoration: none;
+}
+
+/* Auth form improvements */
+.auth-card {
+  max-width: 600px !important; /* Make form wider */
+  padding: 2.5rem !important; /* Add more padding for better spacing */
+}
+
+.auth-form-label {
+  text-align: left !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+  width: 100% !important;
+}
+
+.name-fields-container {
+  gap: 2rem !important; /* Increase gap between name fields for better spacing */
+}
+
+/* Ensure proper spacing in name fields */
+.name-fields-container .auth-form-group {
+  flex: 1;
+  min-width: 0; /* Allow flex items to shrink */
+}
+
+/* Better spacing for form groups */
+.auth-form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Ensure inputs take full width */
+.auth-form-input {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Password input container adjustments */
+.password-input-container {
+  width: 100% !important;
+}
+
+/* Checkbox labels should be inline */
+.auth-form-checkbox label {
+  text-align: left !important;
+  display: inline !important;
+  margin-bottom: 0 !important;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
