@@ -66,6 +66,169 @@
   margin-bottom: 0 !important;
 }
 
+/* Pricing page form labels */
+.payment-form label {
+  text-align: left !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+  width: 100% !important;
+}
+
+.billing-info label {
+  text-align: left !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.card-details label {
+  text-align: left !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.form-group label {
+  text-align: left !important;
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Ensure payment form groups have proper alignment */
+.payment-form .form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* Card input container layout fixes */
+.card-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.card-input-container input {
+  width: 100% !important;
+  padding-right: 80px !important; /* Make room for card icons */
+  box-sizing: border-box;
+}
+
+.card-icons {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 4px;
+  pointer-events: none;
+}
+
+.card-icons i {
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+/* Checkbox alignment fixes - Force override of pricing.css */
+.payment-form .checkbox-label,
+.terms-section .checkbox-label {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 0.75rem !important;
+  text-align: left !important;
+  cursor: pointer;
+  line-height: 1.5;
+  font-size: 0.875rem;
+}
+
+.payment-form .checkbox-label input[type="checkbox"],
+.terms-section .checkbox-label input[type="checkbox"],
+.checkbox-label input[type="checkbox"] {
+  display: block !important; /* Override the display: none from pricing.css */
+  position: relative !important;
+  margin: 0 !important;
+  flex-shrink: 0 !important;
+  margin-top: 0.1rem !important; /* Slight adjustment for better alignment */
+  width: 18px !important;
+  height: 18px !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 1 !important;
+}
+
+.checkbox-text {
+  flex: 1;
+  line-height: 1.5;
+  color: var(--text-primary, #333);
+}
+
+/* Remove custom checkmark since we're using native checkbox */
+.checkmark {
+  display: none !important;
+}
+
+/* Success Modal Styles */
+.success-modal {
+  max-width: 500px;
+  border-radius: 0 !important;
+}
+
+/* Payment Modal - Remove border radius */
+.payment-modal {
+  border-radius: 0 !important;
+}
+
+/* Override all modal containers to remove border radius */
+.modal-container {
+  border-radius: 0 !important;
+}
+
+.success-content {
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: var(--success-color, #28a745);
+  margin-bottom: 1.5rem;
+}
+
+.success-content h4 {
+  font-size: 1.5rem;
+  color: var(--text-primary, #333);
+  margin: 0 0 1rem 0;
+}
+
+.success-content p {
+  color: var(--text-secondary, #666);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.success-features {
+  background: var(--bg-secondary, #f8f9fa);
+  border-radius: var(--border-radius, 8px);
+  padding: 1.5rem;
+  text-align: left;
+  margin-top: 1.5rem;
+}
+
+.success-features h5 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary, #333);
+  font-size: 1rem;
+}
+
+.success-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.success-features li {
+  padding: 0.5rem 0;
+  color: var(--text-primary, #333);
+  font-size: 0.875rem;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;

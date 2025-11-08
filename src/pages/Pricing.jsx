@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [currentPlan, setCurrentPlan] = useState('basic');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
     const initializePage = () => {
@@ -51,15 +54,30 @@ const Pricing = () => {
   };
 
   const selectPlan = (plan) => {
-    if (window.selectPlan) {
-      window.selectPlan(plan);
+    // Always use our custom logic, ignore window.selectPlan to prevent redirects
+    // Show payment modal for the selected plan
+    const modal = document.getElementById('paymentModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const selectedPlan = document.getElementById('selectedPlan');
+    const selectedPrice = document.getElementById('selectedPrice');
+    
+    if (modal && modalTitle && selectedPlan && selectedPrice) {
+      modalTitle.textContent = `Upgrade to ${plan.charAt(0).toUpperCase() + plan.slice(1)}`;
+      selectedPlan.textContent = `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`;
+      
+      // Set pricing based on plan
+      const prices = { pro: '78', enterprise: '1359' };
+      selectedPrice.textContent = prices[plan] || '78';
+      
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
   };
 
-  const scheduleDemo = () => {
-    if (window.scheduleDemo) {
-      window.scheduleDemo();
-    }
+  const handleSuccessfulUpgrade = (plan) => {
+    setCurrentPlan(plan);
+    setShowSuccessModal(true);
+    closePaymentModal();
   };
 
   const toggleFaq = (element) => {
@@ -71,13 +89,53 @@ const Pricing = () => {
   const closePaymentModal = () => {
     if (window.closePaymentModal) {
       window.closePaymentModal();
+    } else {
+      const modal = document.getElementById('paymentModal');
+      if (modal) {
+        modal.style.display = 'none';
+      }
     }
   };
 
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+  };
+
   const processPayment = (event) => {
-    if (window.processPayment) {
-      window.processPayment(event);
+    event.preventDefault();
+    
+    // Always use our custom logic, ignore window.processPayment
+    // Simulate payment process
+    const selectedPlanElement = document.getElementById('selectedPlan');
+    const planName = selectedPlanElement ? selectedPlanElement.textContent.replace(' Plan', '').toLowerCase() : 'pro';
+    
+    // Show loading state
+    const submitButton = document.getElementById('submitPayment');
+    if (submitButton) {
+      const btnText = submitButton.querySelector('.btn-text');
+      const btnLoader = submitButton.querySelector('.btn-loader');
+      if (btnText && btnLoader) {
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline-flex';
+      }
+      submitButton.disabled = true;
     }
+    
+    // Simulate processing time then show success
+    setTimeout(() => {
+      handleSuccessfulUpgrade(planName);
+      
+      // Reset button state
+      if (submitButton) {
+        const btnText = submitButton.querySelector('.btn-text');
+        const btnLoader = submitButton.querySelector('.btn-loader');
+        if (btnText && btnLoader) {
+          btnText.style.display = 'inline';
+          btnLoader.style.display = 'none';
+        }
+        submitButton.disabled = false;
+      }
+    }, 1500);
   };
 
   const formatCardNumber = (input) => {
@@ -96,6 +154,10 @@ const Pricing = () => {
     if (window.formatCVV) {
       window.formatCVV(input);
     }
+  };
+
+  const handlePaymentMethodChange = (method) => {
+    setPaymentMethod(method);
   };
 
   return (
@@ -207,8 +269,17 @@ const Pricing = () => {
               </div>
               
               <div className="pricing-card-cta">
-                <button className="pricing-cta-btn current">Current Plan</button>
-                <p className="pricing-cta-note">You're currently on the Basic plan</p>
+                {currentPlan === 'basic' ? (
+                  <>
+                    <button className="pricing-cta-btn current">Current Plan</button>
+                    <p className="pricing-cta-note">You're currently on the Basic plan</p>
+                  </>
+                ) : (
+                  <>
+                    <button className="pricing-cta-btn secondary" onClick={() => selectPlan('basic')}>Downgrade to Basic</button>
+                    <p className="pricing-cta-note">Switch back to the free plan</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -280,8 +351,19 @@ const Pricing = () => {
               </div>
               
               <div className="pricing-card-cta">
-                <button className="pricing-cta-btn primary" onClick={() => selectPlan('pro')}>Upgrade to Pro</button>
-                <p className="pricing-cta-note">14-day free trial, no credit card required</p>
+                {currentPlan === 'pro' ? (
+                  <>
+                    <button className="pricing-cta-btn current">Current Plan</button>
+                    <p className="pricing-cta-note">You're currently on the Pro plan</p>
+                  </>
+                ) : (
+                  <>
+                    <button className="pricing-cta-btn primary" onClick={() => selectPlan('pro')}>
+                      {currentPlan === 'basic' ? 'Upgrade to Pro' : 'Switch to Pro'}
+                    </button>
+                    <p className="pricing-cta-note">14-day free trial, no credit card required</p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -347,24 +429,20 @@ const Pricing = () => {
               </div>
               
               <div className="pricing-card-cta">
-                <button className="pricing-cta-btn secondary" onClick={() => selectPlan('enterprise')}>Upgrade to Enterprise</button>
-                <p className="pricing-cta-note">14-day free trial, no credit card required</p>
+                {currentPlan === 'enterprise' ? (
+                  <>
+                    <button className="pricing-cta-btn current">Current Plan</button>
+                    <p className="pricing-cta-note">You're currently on the Enterprise plan</p>
+                  </>
+                ) : (
+                  <>
+                    <button className="pricing-cta-btn secondary" onClick={() => selectPlan('enterprise')}>
+                      {currentPlan === 'basic' ? 'Upgrade to Enterprise' : 'Switch to Enterprise'}
+                    </button>
+                    <p className="pricing-cta-note">14-day free trial, no credit card required</p>
+                  </>
+                )}
               </div>
-            </div>
-          </div>
-
-          {/* Enterprise Contact Section */}
-          <div className="enterprise-contact">
-            <h3 className="enterprise-title">Need something more?</h3>
-            <p className="enterprise-description">
-              Looking for custom features, on-premise deployment, or have a large team? 
-              Our enterprise solutions are designed to meet your specific needs.
-            </p>
-            <div className="enterprise-cta">
-              <a href="#" className="enterprise-btn secondary" onClick={scheduleDemo}>
-                <i className="fas fa-calendar"></i>
-                Schedule Demo
-              </a>
             </div>
           </div>
 
@@ -462,15 +540,27 @@ const Pricing = () => {
               <div className="payment-methods">
                 <h4>Payment Method</h4>
                 <div className="payment-options">
-                  <label className="payment-option active">
-                    <input type="radio" name="paymentMethod" value="card" defaultChecked />
+                  <label className={`payment-option ${paymentMethod === 'card' ? 'active' : ''}`} style={{cursor: 'pointer'}}>
+                    <input 
+                      type="radio" 
+                      name="paymentMethod" 
+                      value="card" 
+                      checked={paymentMethod === 'card'}
+                      onChange={() => handlePaymentMethodChange('card')}
+                    />
                     <div className="payment-option-content">
                       <i className="fas fa-credit-card"></i>
                       <span>Credit/Debit Card</span>
                     </div>
                   </label>
-                  <label className="payment-option">
-                    <input type="radio" name="paymentMethod" value="paypal" />
+                  <label className={`payment-option ${paymentMethod === 'paypal' ? 'active' : ''}`} style={{cursor: 'pointer'}}>
+                    <input 
+                      type="radio" 
+                      name="paymentMethod" 
+                      value="paypal" 
+                      checked={paymentMethod === 'paypal'}
+                      onChange={() => handlePaymentMethodChange('paypal')}
+                    />
                     <div className="payment-option-content">
                       <i className="fab fa-paypal"></i>
                       <span>PayPal</span>
@@ -480,8 +570,9 @@ const Pricing = () => {
               </div>
 
               {/* Card Details */}
-              <div className="card-details" id="cardDetails">
-                <div className="form-group">
+              {paymentMethod === 'card' && (
+                <div className="card-details" id="cardDetails">
+                  <div className="form-group">
                   <label htmlFor="cardNumber">Card Number</label>
                   <div className="card-input-container">
                     <input type="text" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" 
@@ -515,24 +606,21 @@ const Pricing = () => {
                   <input type="text" id="cardName" name="cardName" placeholder="John Doe" />
                   <span className="error-message" id="cardNameError"></span>
                 </div>
-              </div>
+                </div>
+              )}
+
+              {/* PayPal Option */}
+              {paymentMethod === 'paypal' && (
+                <div className="paypal-details">
+                  <div className="paypal-info">
+                    <p>You will be redirected to PayPal to complete your payment securely.</p>
+                  </div>
+                </div>
+              )}
 
               {/* Billing Information */}
               <div className="billing-info">
                 <h4>Billing Information</h4>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="firstName">First Name</label>
-                    <input type="text" id="firstName" name="firstName" />
-                    <span className="error-message" id="firstNameError"></span>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="lastName">Last Name</label>
-                    <input type="text" id="lastName" name="lastName" />
-                    <span className="error-message" id="lastNameError"></span>
-                  </div>
-                </div>
-
                 <div className="form-group">
                   <label htmlFor="email">Email Address</label>
                   <input type="email" id="email" name="email" />
@@ -543,7 +631,7 @@ const Pricing = () => {
                   <label htmlFor="country">Country</label>
                   <select id="country" name="country">
                     <option value="">Select Country</option>
-                    <option value="PH" selected>Philippines</option>
+                    <option value="PH" defaultSelected>Philippines</option>
                     <option value="US">United States</option>
                     <option value="CA">Canada</option>
                     <option value="GB">United Kingdom</option>
@@ -557,10 +645,9 @@ const Pricing = () => {
               <div className="terms-section">
                 <label className="checkbox-label">
                   <input type="checkbox" id="agreeTerms" name="agreeTerms" />
-                  <span className="checkmark"></span>
                   <span className="checkbox-text">
-                    I agree to the <a href="#" className="terms-link">Terms of Service</a> and 
-                    <a href="#" className="terms-link">Privacy Policy</a>
+                    I agree to the <a href="/terms" className="terms-link">Terms of Service</a> and{' '}
+                    <a href="/privacy" className="terms-link">Privacy Policy</a>
                   </span>
                 </label>
                 <span className="error-message" id="termsError"></span>
@@ -586,6 +673,42 @@ const Pricing = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="modal-overlay" style={{display: 'flex'}}>
+          <div className="modal-container success-modal">
+            <div className="modal-header">
+              <h3 className="modal-title">🎉 Upgrade Successful!</h3>
+              <button className="modal-close" onClick={closeSuccessModal}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="success-content">
+                <div className="success-icon">
+                  <i className="fas fa-check-circle"></i>
+                </div>
+                <h4>Welcome to {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}!</h4>
+                <p>
+                  Your account has been successfully upgraded to the {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} plan. 
+                  You now have access to all the premium features and your 14-day free trial has started.
+                </p>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn-primary" onClick={() => navigate('/')}>
+                Go to Dashboard
+              </button>
+              <button className="btn-secondary" onClick={closeSuccessModal}>
+                Stay on Pricing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

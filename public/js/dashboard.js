@@ -82,6 +82,11 @@ async function loadBoards() {
 // Render boards to the grid
 function renderBoards(boards) {
     const boardsGrid = document.getElementById('boards-grid');
+    if (!boardsGrid) {
+        console.warn('Boards grid element not found');
+        return;
+    }
+    
     const createNewTile = boardsGrid.querySelector('.board-tile.create-new');
     
     // Clear existing boards (except create new tile)
@@ -386,6 +391,13 @@ function toggleProfileDropdown() {
 
 // Update recent activity with real-time data
 function updateRecentActivity() {
+    // Check if activity list exists before setting up updates
+    const activityList = document.querySelector('.activity-list');
+    if (!activityList) {
+        console.warn('Activity list not found, skipping recent activity updates');
+        return;
+    }
+    
     // Simulate real-time updates
     setInterval(() => {
         const activities = [
@@ -433,6 +445,11 @@ function updateRecentActivity() {
 
 function addActivityItem(activity) {
     const activityList = document.querySelector('.activity-list');
+    if (!activityList) {
+        console.warn('Activity list element not found');
+        return;
+    }
+    
     const firstItem = activityList.querySelector('.activity-item');
     
     const newItem = document.createElement('li');
