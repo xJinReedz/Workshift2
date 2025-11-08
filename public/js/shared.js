@@ -435,6 +435,10 @@ function openProfileModal() {
                 <div class="profile-section">
                     <div class="profile-avatar-large">LT</div>
                     <h3>Luc Trevecedo</h3>
+                    <!-- Centered logout button below the name -->
+                    <div style="margin-top:0.75rem; display:flex; justify-content:center;">
+                        <button class="btn btn-secondary" id="profile-logout-btn" style="min-width:120px;">Logout</button>
+                    </div>
                 </div>
                 
                 <div class="profile-form">
@@ -473,6 +477,21 @@ function openProfileModal() {
     `;
     
     document.body.appendChild(modal);
+    // Wire logout button (added to modal) to the logout handler
+    const logoutBtn = document.getElementById('profile-logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function () {
+            // close modal immediately
+            const pm = document.querySelector('.profile-modal');
+            if (pm) pm.remove();
+            // Call logout
+            if (typeof handleLogout === 'function') {
+                await handleLogout();
+            } else if (window.handleLogout) {
+                await window.handleLogout();
+            }
+        });
+    }
 }
 
 function saveProfileChanges() {
@@ -522,16 +541,15 @@ async function handleLogout() {
     try {
         const result = await window.api.logout();
         if (result.success) {
-            showSuccess('Logged out successfully!');
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 1000);
+            // Redirect immediately to the React login route
+            window.location.href = '/login';
         } else {
             showValidationError('Logout failed');
         }
     } catch (error) {
         console.error('Logout error:', error);
-        window.location.href = 'login.html'; // Force redirect even if logout fails
+        // Force redirect to the React login route even if logout fails
+        window.location.href = '/login';
     }
 }
 
