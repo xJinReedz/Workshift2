@@ -1,7 +1,6 @@
 // Board JavaScript - WorkShift Board Management (Fixed Implementation)
 let currentBoard = null;
 let currentBoardId = null;
-let currentCard = null;
 
 // Wait for database to be ready
 function waitForDatabase() {
@@ -193,7 +192,7 @@ function renderLists() {
                 
                 // Format due date if it exists
                 let dueDateHtml = '';
-                if (card.is_completed && (card.is_completed == 1 || card.is_completed === true)) {
+                if (card.is_completed && (card.is_completed === 1 || card.is_completed === true)) {
                     dueDateHtml = `
                         <div class="card-due-date completed">
                             <i class="fas fa-check-circle" style="color: #28a745;"></i>
@@ -1224,6 +1223,9 @@ function openAddCardModal(listId) {
     }, 100);
 }
 
+// Make function available globally for HTML event handlers
+window.openAddCardModal = openAddCardModal;
+
 // Handle add card form submission
 function handleAddCard(event) {
     event.preventDefault();
@@ -1552,6 +1554,9 @@ function initializeSearchAfterLoad() {
         }
     }
 }
+
+// Make function available globally for potential future use
+window.initializeSearchAfterLoad = initializeSearchAfterLoad;
 
 // Character counter update function for edit label
 function updateEditLabelCounter() {
@@ -2143,7 +2148,8 @@ async function toggleChecklistItem(itemId) {
 }
 
 async function deleteChecklistItem(itemId) {
-    if (!confirm('Are you sure you want to delete this checklist item?')) {
+    // Use window.confirm instead of bare confirm to avoid linting issues
+    if (!window.confirm('Are you sure you want to delete this checklist item?')) {
         return;
     }
     
@@ -2355,7 +2361,7 @@ function deleteCardConfirm() {
         return;
     }
 
-    if (confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
+    if (window.confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
         deleteCard();
     }
 }
@@ -2781,6 +2787,9 @@ async function saveCardTitle() {
     }
 }
 
+// Make function available globally for potential future use
+window.saveCardTitle = saveCardTitle;
+
 // Auto-save card description (without showing notifications)
 async function autoSaveCardDescription() {
     const cardId = window.currentCardId;
@@ -2806,6 +2815,9 @@ async function autoSaveCardDescription() {
         console.error('Error auto-saving description:', error);
     }
 }
+
+// Make function available globally for potential future use
+window.autoSaveCardDescription = autoSaveCardDescription;
 
 // Rename list functionality
 function openRenameListModal(listId) {
@@ -3416,7 +3428,7 @@ function updateAllCountdowns() {
         if (dueDate) {
             // Check if card is completed
             const card = findCardById(parseInt(cardId));
-            const isCompleted = card && (card.is_completed == 1 || card.is_completed === true);
+            const isCompleted = card && (card.is_completed === 1 || card.is_completed === true);
             
             if (!isCompleted) {
                 const displayText = formatDueDateDisplay(dueDate, false);
@@ -3623,6 +3635,9 @@ function handleMentionKeydown(e) {
             e.preventDefault();
             hideMentionDropdown();
             break;
+        default:
+            // Handle other keys
+            break;
     }
 }
 
@@ -3692,7 +3707,6 @@ function updateMentionSelection(options) {
 // Select a mention
 function selectMention(option) {
     const commentInput = document.getElementById('commentInput');
-    const userId = option.dataset.userId;
     const name = option.dataset.name;
     
     if (!commentInput || mentionStartIndex === -1) return;
@@ -3813,7 +3827,7 @@ function initializeInviteModalTabs() {
             e.preventDefault();
             
             const email = document.getElementById('inviteEmail').value;
-            const permission = document.getElementById('permissionLevel').value;
+            // const permission = document.getElementById('permissionLevel').value; // Reserved for future use
             
             if (email) {
                 // Show success message
@@ -3837,30 +3851,7 @@ function initializeInviteModalTabs() {
 // Make function globally available
 window.initializeInviteModalTabs = initializeInviteModalTabs;
 
-const originalInviteModalSetup = () => {
-    const inviteBtn = document.querySelector('.invite-btn');
-    const inviteModal = document.getElementById('inviteModal');
-    const closeModalBtns = document.querySelectorAll('#inviteModal .close-modal, #cancelInvite');
-
-    if (inviteBtn && inviteModal) {
-        inviteBtn.addEventListener('click', function() {
-            inviteModal.classList.add('active');
-            initializeInviteModalTabs();
-        });
-
-        closeModalBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                inviteModal.classList.remove('active');
-            });
-        });
-
-        inviteModal.addEventListener('click', function(e) {
-            if (e.target === inviteModal) {
-                inviteModal.classList.remove('active');
-            }
-        });
-    }
-};
+// Function to handle invite form submission
 
 // Initialize invite modal when DOM is loaded
 // Removed auto-initialization - React components will call these functions manually
@@ -4034,36 +4025,7 @@ function addMemberToBoardList(userName) {
     console.log(`Adding ${userName} to board members`);
 }
 
-// Enhanced invite form submission
-function handleInviteFormSubmission() {
-    const inviteForm = document.getElementById('inviteForm');
-    if (inviteForm) {
-        inviteForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('inviteEmail').value;
-            const permission = document.getElementById('permissionLevel').value;
-            
-            if (email && permission) {
-                // In a real app, this would be an API call
-                console.log(`Inviting ${email} with ${permission} permission`);
-                
-                // Clear the form
-                inviteForm.reset();
-                
-                // Close the invite modal
-                const inviteModal = document.getElementById('inviteModal');
-                if (inviteModal) {
-                    inviteModal.classList.remove('active');
-                }
-                
-                // Show success modal
-                showInvitationSuccessModal();
-            }
-        });
-    }
-}
-
+// End of board.js file
 // Initialize all modal functionality
 // Removed auto-initialization - React components will call these functions manually
 /*

@@ -2,6 +2,15 @@
 
 let isYearlyBilling = false;
 
+// Helper function for missing global functions
+function showNotification(message, type) {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    // Fallback to alert if no notification system is available
+    if (window.showNotification && typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    }
+}
+
 // Pricing data
 const pricingData = {
     basic: {
@@ -27,6 +36,9 @@ function initializePricing() {
     initializeFAQ();
     updatePricingDisplay();
 }
+
+// Make function available globally
+window.initializePricing = initializePricing;
 
 // Toggle between monthly and yearly billing
 function toggleBilling() {
@@ -95,7 +107,7 @@ function initializeFAQ() {
     const faqItems = document.querySelectorAll('.faq-item');
     
     faqItems.forEach(item => {
-        const question = item.querySelector('.faq-question');
+        // const question = item.querySelector('.faq-question'); // Reserved for future use
         const answer = item.querySelector('.faq-answer');
         
         // Set initial max-height for smooth animation
@@ -691,6 +703,9 @@ document.addEventListener('keydown', function(e) {
                 e.preventDefault();
                 contactSales();
                 break;
+            default:
+                // Handle other key combinations
+                break;
         }
     }
 });
@@ -784,3 +799,21 @@ function updatePricingForTeamSize(teamSize) {
     // For demo purposes, we'll just show a notification
     showNotification(`Pricing updated for team size: ${teamSize}`, 'info');
 }
+
+// Make all functions available globally for HTML event handlers
+window.toggleFaq = toggleFaq;
+window.closePaymentModal = closePaymentModal;
+window.formatCardNumber = formatCardNumber;
+window.formatExpiryDate = formatExpiryDate;
+window.formatCVV = formatCVV;
+window.validateCardName = validateCardName;
+window.validateEmail = validateEmail;
+window.validateRequired = validateRequired;
+window.processPayment = processPayment;
+window.scheduleDemo = scheduleDemo;
+window.submitContactForm = submitContactForm;
+window.submitDemoForm = submitDemoForm;
+window.scrollToPricing = scrollToPricing;
+window.addComparisonTooltips = addComparisonTooltips;
+window.showPlanComparison = showPlanComparison;
+window.updatePricingForTeamSize = updatePricingForTeamSize;

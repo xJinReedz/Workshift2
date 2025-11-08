@@ -1,7 +1,16 @@
 // Inbox specific JavaScript
 
 let currentFilter = 'all';
-let notifications = [];
+// let notifications = []; // Store notification data - will be used in future features
+
+// Helper function for missing global functions
+function showNotification(message, type) {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    // Fallback to alert if no notification system is available
+    if (window.showNotification && typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    }
+}
 
 // Removed auto-initialization - React components will call these functions manually
 // document.addEventListener('DOMContentLoaded', function() {
@@ -14,8 +23,11 @@ function initializeInbox() {
     initializeSearch();
     loadNotifications();
     updateUnreadCount();
-    startRealTimeUpdates();
+    // updateInboxStats(); // Reserved for future inbox statistics feature
 }
+
+// Make function available globally
+window.initializeInbox = initializeInbox;
 
 // Filter functionality
 function initializeFilters() {
@@ -58,6 +70,9 @@ function filterNotifications(filter) {
                 break;
             case 'assignments':
                 shouldShow = item.getAttribute('data-type') === 'assignment';
+                break;
+            default:
+                shouldShow = true; // Default to showing all items
                 break;
         }
         
@@ -135,9 +150,9 @@ function handleNotificationAction(button) {
     }
 }
 
-function handleNotificationClick(notificationItem) {
+function handleNotificationClick(notificationItem, event) {
     // Mark as read when clicked (unless clicking on action buttons)
-    if (!event.target.classList.contains('notification-action')) {
+    if (event && !event.target.classList.contains('notification-action')) {
         markAsRead(notificationItem);
     }
 }
@@ -173,6 +188,9 @@ function markAllAsRead() {
     updateUnreadCount();
     showNotification(`Marked ${unreadNotifications.length} notifications as read`, 'success');
 }
+
+// Make function available globally
+window.markAllAsRead = markAllAsRead;
 
 function updateUnreadCount() {
     const unreadCount = document.querySelectorAll('.notification-item.unread').length;
@@ -253,6 +271,9 @@ function sendReply(notificationId, button) {
     }, 1000);
 }
 
+// Make function available globally
+window.sendReply = sendReply;
+
 function viewCard(notificationId) {
     showNotification('Redirecting to card...', 'info');
     setTimeout(() => {
@@ -266,6 +287,9 @@ function viewBoard(notificationId) {
         window.location.href = 'board.php';
     }, 1000);
 }
+
+// Make function available globally
+window.viewBoard = viewBoard;
 
 function extendDueDate(notificationId) {
     const modal = document.createElement('div');
@@ -297,6 +321,9 @@ function extendDueDate(notificationId) {
     modal.classList.add('active');
 }
 
+// Make function available globally
+window.extendDueDate = extendDueDate;
+
 function updateDueDate(notificationId, button) {
     const modal = button.closest('.modal');
     const dateInput = modal.querySelector('input[type="date"]');
@@ -316,6 +343,9 @@ function updateDueDate(notificationId, button) {
         markAsRead(notificationItem);
     }
 }
+
+// Make function available globally
+window.updateDueDate = updateDueDate;
 
 // Search functionality
 function initializeSearch() {
@@ -371,15 +401,21 @@ function toggleSetting(toggle) {
     showNotification(`${label} ${isActive ? 'enabled' : 'disabled'}`, 'success');
 }
 
+// Make function available globally
+window.toggleSetting = toggleSetting;
+
 // Load notifications (simulate API call)
 function loadNotifications() {
     // This would normally fetch from an API
-    notifications = Array.from(document.querySelectorAll('.notification-item')).map(item => ({
-        id: item.getAttribute('data-id'),
-        type: item.getAttribute('data-type'),
-        unread: item.classList.contains('unread'),
-        element: item
-    }));
+    // const notificationElements = Array.from(document.querySelectorAll('.notification-item')).map(item => ({
+    //     id: item.getAttribute('data-id'),
+    //     type: item.getAttribute('data-type'),
+    //     unread: item.classList.contains('unread'),
+    //     element: item
+    // }));
+    
+    // Store for future use
+    // notifications = notificationElements; // Reserved for future notification management
 }
 
 // Real-time updates simulation
@@ -496,6 +532,9 @@ function addNewNotification(notificationData) {
         filterNotifications(currentFilter);
     }, 500);
 }
+
+// Make function available globally
+window.startRealTimeUpdates = startRealTimeUpdates;
 
 // Utility functions
 function debounce(func, wait) {

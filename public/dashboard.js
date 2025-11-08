@@ -1,5 +1,29 @@
 // Dashboard specific JavaScript
 
+// Helper functions for missing global functions
+function showNotification(message, type) {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    // Fallback to alert if no notification system is available
+    if (window.showNotification && typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    }
+}
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+    }
+}
+
+function closeModal(modal) {
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
 // Removed auto-initialization - React components will call these functions manually
 // document.addEventListener('DOMContentLoaded', function() {
 //     initializeDashboard();
@@ -13,6 +37,9 @@ function initializeDashboard() {
     initializeProfileDropdown();
     updateRecentActivity();
 }
+
+// Make function available globally
+window.initializeDashboard = initializeDashboard;
 
 // Load boards from database
 async function loadBoards() {
@@ -244,7 +271,7 @@ async function handleCreateBoard() {
 // Template selection
 function initializeTemplateSelection() {
     const templateItems = document.querySelectorAll('#template-modal .template-item');
-    let selectedTemplate = null;
+    // let selectedTemplate = null; // Reserved for future template functionality
     
     templateItems.forEach(item => {
         item.addEventListener('click', function() {
@@ -255,7 +282,7 @@ function initializeTemplateSelection() {
             this.style.borderColor = 'var(--primary-color)';
             this.style.background = 'rgba(0, 121, 191, 0.05)';
             
-            selectedTemplate = this.querySelector('.template-name').textContent;
+            // selectedTemplate = this.querySelector('.template-name').textContent; // Reserved for future use
         });
     });
 }
@@ -292,6 +319,9 @@ async function toggleStar(button, boardId) {
         showNotification('Error updating board', 'error');
     }
 }
+
+// Make function available globally
+window.toggleStar = toggleStar;
 
 // Profile dropdown
 function initializeProfileDropdown() {
@@ -461,6 +491,9 @@ function confirmDeleteBoard(boardId, boardTitle) {
     }
 }
 
+// Make function available globally
+window.confirmDeleteBoard = confirmDeleteBoard;
+
 async function deleteBoard() {
     if (!boardToDelete) {
         showNotification('No board selected for deletion', 'error');
@@ -509,9 +542,12 @@ async function deleteBoard() {
     }
 }
 
+// Make function available globally
+window.deleteBoard = deleteBoard;
+
 // Override the shared search function for dashboard-specific behavior
 if (window.WorkShift) {
-    const originalHandleSearch = window.handleSearch;
+    // const originalHandleSearch = window.handleSearch; // Reserved for future use
     window.handleSearch = function() {
         const searchInput = document.querySelector('.search-input');
         const query = searchInput.value.trim();

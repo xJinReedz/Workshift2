@@ -3,15 +3,46 @@
 let currentDate = new Date(2025, 9, 27); // October 27, 2025 (month is 0-indexed)
 let currentView = 'monthly';
 
-// Google Calendar API configuration
-const GOOGLE_CONFIG = {
-    apiKey: 'YOUR_GOOGLE_API_KEY', // Replace with your actual API key
-    clientId: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your actual client ID
-    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
-    scopes: 'https://www.googleapis.com/auth/calendar'
-};
+// Fallback functions for missing global functions
+function showNotification(message, type) {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+    // Fallback to alert if no notification system is available
+    if (window.showNotification && typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    }
+}
 
-let isGoogleApiLoaded = false;
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+    }
+}
+
+function closeModal(modal) {
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function addHourToTime(timeStr) {
+    // Simple time helper function
+    const [hours, minutes] = timeStr.split(':');
+    const newHours = (parseInt(hours) + 1) % 24;
+    return `${newHours.toString().padStart(2, '0')}:${minutes}`;
+}
+
+// Google Calendar API configuration (for future use)
+// const GOOGLE_CONFIG = {
+//     apiKey: 'YOUR_GOOGLE_API_KEY', // Replace with your actual API key
+//     clientId: 'YOUR_GOOGLE_CLIENT_ID', // Replace with your actual client ID
+//     discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+//     scopes: 'https://www.googleapis.com/auth/calendar'
+// };
+
+// let isGoogleApiLoaded = false; // Reserved for future use
 let isGoogleSignedIn = false;
 let googleCalendarList = [];
 let autoSyncEnabled = false;
@@ -413,6 +444,9 @@ function initializeCalendar() {
     updateCalendarPeriod();
 }
 
+// Make function available globally
+window.initializeCalendar = initializeCalendar;
+
 // Mobile-specific enhancements
 function initializeMobileEnhancements() {
     // Add touch support for better mobile interaction
@@ -421,6 +455,9 @@ function initializeMobileEnhancements() {
     // Optimize for mobile screen sizes
     handleMobileViewportChanges();
 }
+
+// Make function available globally
+window.initializeMobileEnhancements = initializeMobileEnhancements;
 
 function addTouchSupport() {
     // Add touch event handling for calendar days
@@ -615,6 +652,9 @@ function switchView(view) {
         case 'agenda':
             renderAgendaView();
             break;
+        default:
+            renderMonthlyView(); // Default to monthly view
+            break;
     }
     
     updateCalendarPeriod();
@@ -637,6 +677,10 @@ function navigatePrevious() {
         case 'daily':
             currentDate.setDate(currentDate.getDate() - 1);
             break;
+        default:
+            // Default to monthly navigation
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            break;
     }
     renderCalendar();
     updateCalendarPeriod();
@@ -652,6 +696,10 @@ function navigateNext() {
             break;
         case 'daily':
             currentDate.setDate(currentDate.getDate() + 1);
+            break;
+        default:
+            // Default to monthly navigation
+            currentDate.setMonth(currentDate.getMonth() + 1);
             break;
     }
     renderCalendar();
@@ -683,6 +731,10 @@ function updateCalendarPeriod() {
         case 'daily':
             periodElement.textContent = `${days[currentDate.getDay()]}, ${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
             break;
+        default:
+            // Default to monthly format
+            periodElement.textContent = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            break;
     }
 }
 
@@ -698,6 +750,10 @@ function renderCalendar() {
         case 'daily':
             renderDailyView();
             break;
+        default:
+            // Default to monthly view
+            renderMonthlyView();
+            break;
     }
 }
 
@@ -708,7 +764,7 @@ function renderMonthlyView() {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+    // const lastDay = new Date(year, month + 1, 0); // Not used but might be needed later
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
@@ -979,14 +1035,19 @@ function updateWeeklyHeader(weekStart) {
     });
 }
 
-function selectDate(date) {
+function selectDate(date, event) {
     // Remove previous selection
     document.querySelectorAll('.calendar-day.selected').forEach(day => {
         day.classList.remove('selected');
     });
     
     // Add selection to clicked day
-    event.target.closest('.calendar-day').classList.add('selected');
+    if (event && event.target) {
+        const calendarDay = event.target.closest('.calendar-day');
+        if (calendarDay) {
+            calendarDay.classList.add('selected');
+        }
+    }
     
     // Switch to daily view for selected date
     currentDate = new Date(date);
@@ -1106,6 +1167,9 @@ function showEventFromModal(eventId) {
         showEventDetails(event);
     }
 }
+
+// Make function available globally
+window.showEventFromModal = showEventFromModal;
 
 // Priority Selection - REMOVED
 
@@ -1287,7 +1351,7 @@ initializeCalendarSearch();
 // Google Calendar API Initialization - Simulated for demo
 function initializeGoogleAPI() {
     // Simulated initialization - no actual API calls
-    isGoogleApiLoaded = true;
+    // isGoogleApiLoaded = true; // Reserved for future use
     checkGoogleSignInStatus();
 }
 
@@ -1336,13 +1400,22 @@ function disconnectFromGoogle() {
 function loadGoogleCalendars() {
     if (!isGoogleSignedIn) return;
     
-    gapi.client.load('calendar', 'v3', function() {
-        gapi.client.calendar.calendarList.list().then(function(response) {
+    // Fallback for when Google API is not available
+    if (typeof window.gapi === 'undefined' || !window.gapi.client) {
+        console.warn('Google API not available');
+        return;
+    }
+    
+    window.gapi.client.load('calendar', 'v3', function() {
+        window.gapi.client.calendar.calendarList.list().then(function(response) {
             googleCalendarList = response.result.items;
             populateCalendarSelect();
         });
     });
 }
+
+// Make function available globally
+window.loadGoogleCalendars = loadGoogleCalendars;
 
 function populateCalendarSelect() {
     const select = document.getElementById('google-calendar-select');
@@ -1388,7 +1461,7 @@ function syncToGoogle() {
             }
         };
         
-        return gapi.client.calendar.events.insert({
+        return window.gapi.client.calendar.events.insert({
             calendarId: selectedCalendar,
             resource: googleEvent
         });
@@ -1402,6 +1475,9 @@ function syncToGoogle() {
         showNotification('Failed to sync some events', 'error');
     });
 }
+
+// Make function available globally
+window.syncToGoogle = syncToGoogle;
 
 function syncFromGoogle() {
     if (!isGoogleSignedIn) {
@@ -1421,7 +1497,7 @@ function syncFromGoogle() {
     const timeMin = new Date().toISOString();
     const timeMax = new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString(); // Next 60 days
     
-    gapi.client.calendar.events.list({
+    window.gapi.client.calendar.events.list({
         calendarId: selectedCalendar,
         timeMin: timeMin,
         timeMax: timeMax,
@@ -1469,6 +1545,9 @@ function syncFromGoogle() {
         showNotification('Failed to import events from Google Calendar', 'error');
     });
 }
+
+// Make function available globally
+window.syncFromGoogle = syncFromGoogle;
 
 function toggleAutoSync() {
     if (!isGoogleSignedIn) {
@@ -1622,6 +1701,9 @@ function showCalendarDeadlineError(message) {
     // Show modal-style error
     showCalendarDeadlineErrorModal(message);
 }
+
+// Make function available globally
+window.showCalendarDeadlineError = showCalendarDeadlineError;
 
 function hideCalendarDeadlineError() {
     const errorElement = document.getElementById('event-deadline-validation-error');
@@ -1827,6 +1909,9 @@ function populateEventForm(event, eventForm) {
     }
 }
 
+// Make function available globally
+window.editEvent = editEvent;
+
 function cancelEditEvent() {
     currentEditingEvent = null;
     
@@ -1889,6 +1974,9 @@ function deleteEvent(eventId) {
     confirmModal.classList.add('active');
 }
 
+// Make function available globally
+window.deleteEvent = deleteEvent;
+
 function confirmDeleteEvent(eventId) {
     const eventIndex = sampleEvents.findIndex(e => e.id === eventId);
     if (eventIndex > -1) {
@@ -1902,6 +1990,9 @@ function confirmDeleteEvent(eventId) {
         showNotification(`Event "${event.title}" deleted successfully`, 'success');
     }
 }
+
+// Make function available globally
+window.confirmDeleteEvent = confirmDeleteEvent;
 
 // Modal close handler to reset edit state
 function handleEventModalClose() {
