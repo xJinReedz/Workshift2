@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check and Clear Database</title>
+</head>
+<body>
+    <h1>WorkShift Database Checker</h1>
+    <button onclick="checkDatabase()">Check Current Database</button>
+    <button onclick="clearAndReset()">Clear and Reset Database</button>
+    <div id="output"></div>
+
+    <script src="js/database.js"></script>
+    <script>
+        function checkDatabase() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<h3>Current Database State:</h3>';
+            
+            // Check if database is initialized
+            const isInit = localStorage.getItem('workshift_db_initialized');
+            output.innerHTML += `<p>Database Initialized: ${isInit}</p>`;
+            
+            // Check users table
+            const users = localStorage.getItem('workshift_db_users');
+            if (users) {
+                const userList = JSON.parse(users);
+                output.innerHTML += '<h4>Users in database:</h4>';
+                userList.forEach(user => {
+                    output.innerHTML += `<p>Email: ${user.email}, Name: ${user.first_name} ${user.last_name}</p>`;
+                });
+            } else {
+                output.innerHTML += '<p>No users found in database</p>';
+            }
+            
+            // List all localStorage keys
+            output.innerHTML += '<h4>All localStorage keys:</h4>';
+            Object.keys(localStorage).forEach(key => {
+                if (key.includes('workshift')) {
+                    output.innerHTML += `<p>${key}</p>`;
+                }
+            });
+        }
+        
+        function clearAndReset() {
+            // Clear all WorkShift localStorage data
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('workshift_db')) {
+                    localStorage.removeItem(key);
+                    console.log('Removed:', key);
+                }
+            });
+            
+            // Reinitialize database
+            const db = new WorkShiftDB();
+            
+            document.getElementById('output').innerHTML = '<h3 style="color: green;">Database cleared and reset!</h3><p>You can now login with luc@gmail.com and workshift123@@</p>';
+            
+            // Check the new database
+            setTimeout(checkDatabase, 500);
+        }
+    </script>
+</body>
+</html>

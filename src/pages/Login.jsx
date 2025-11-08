@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const initializePage = () => {
@@ -99,25 +100,11 @@ const Login = () => {
     window.handleSocialLogin(provider);
   };
 
-  const testLogin = async () => {
-    // Auto-login for testing
-    if (window.api) {
-      try {
-        const result = await window.api.login({ 
-          email: 'john@gmail.com', 
-          password: 'workshift123@@' 
-        });
-        
-        if (result.success) {
-          navigate('/');
-        } else {
-          console.error('Auto-login failed:', result.message);
-        }
-      } catch (error) {
-        console.error('Auto-login error:', error);
-      }
-    }
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
+
+
 
   return (
     <div className="auth-container">
@@ -162,15 +149,21 @@ const Login = () => {
             <label className="auth-form-label" htmlFor="password">Password</label>
             <div className="password-input-container">
               <input 
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 id="password" 
                 className="auth-form-input password-input" 
                 placeholder="Enter your password"
                 required
                 autoComplete="current-password"
               />
-              <button type="button" className="password-toggle" id="password-toggle" aria-label="Show password">
-                <i className="fas fa-eye" id="password-toggle-icon"></i>
+              <button 
+                type="button" 
+                className="password-toggle" 
+                id="password-toggle" 
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={togglePasswordVisibility}
+              >
+                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`} id="password-toggle-icon"></i>
               </button>
             </div>
           </div>
@@ -185,10 +178,6 @@ const Login = () => {
 
           <button type="submit" className="auth-submit-btn" id="login-btn">
             Sign In
-          </button>
-          
-          <button type="button" className="auth-submit-btn" style={{marginTop: '10px', backgroundColor: '#28a745'}} onClick={testLogin}>
-            Quick Test Login
           </button>
         </form>
 

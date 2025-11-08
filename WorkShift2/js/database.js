@@ -175,7 +175,7 @@ class WorkShiftDB {
             {
                 first_name: 'Luc',
                 last_name: 'Trevecedo',
-                email: 'john@gmail.com',
+                email: 'luc@gmail.com',
                 password: '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // workshift123@@
                 avatar: 'LT',
                 avatar_color: '#0079bf',
