@@ -165,27 +165,47 @@ const Register = () => {
     checkPasswordStrength(e.target.value);
   };
 
-  const handleSocialLogin = (provider) => {
-    // Simulate successful Google login/register and redirect to board
+  const handleSocialLogin = async (provider) => {
+    // Use real authentication with luc@gmail.com credentials for Google login/register
     if (provider === 'Google') {
-      // Set authentication state
-      if (window.api) {
-        window.api.currentUser = {
-          id: 1,
-          email: 'user@gmail.com',
-          name: 'Google User'
-        };
-        
-        // Save session
-        localStorage.setItem('workshift_user', JSON.stringify({
-          email: 'user@gmail.com',
-          name: 'Google User',
-          avatar: 'GU'
-        }));
+      const submitBtn = document.querySelector('.social-login-btn.google');
+      
+      // Show loading state
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fab fa-google social-login-icon"></i> Signing in...';
       }
       
-      // Navigate to board
-      navigate('/');
+      try {
+        // Call the actual API login with luc@gmail.com credentials
+        const result = await window.api.login({ 
+          email: 'luc@gmail.com', 
+          password: 'workshift123@@' 
+        });
+        
+        if (result.success) {
+          // Store user data
+          localStorage.setItem('workshift_user', JSON.stringify({
+            email: 'luc@gmail.com',
+            name: result.data.user.first_name + ' ' + result.data.user.last_name,
+            avatar: result.data.user.avatar
+          }));
+          
+          // Navigate to board
+          navigate('/');
+        } else {
+          window.showAuthError('Google sign-up failed. Please try again.');
+        }
+      } catch (error) {
+        console.error('Google sign-up error:', error);
+        window.showAuthError('Google sign-up failed. Please try again.');
+      } finally {
+        // Reset button state
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fab fa-google social-login-icon"></i> Continue with Google';
+        }
+      }
     }
   };
 
