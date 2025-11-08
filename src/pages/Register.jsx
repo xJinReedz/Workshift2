@@ -20,6 +20,12 @@ const Register = () => {
         if (window.initializeRegisterForm) {
           window.initializeRegisterForm();
         }
+        
+        // Ensure button is enabled by default (will be controlled by validation)
+        const submitBtn = document.getElementById('register-btn');
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
       }, 100);
       
       // Override the original register redirect to use React Router
