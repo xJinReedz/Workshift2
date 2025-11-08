@@ -127,9 +127,6 @@ class WorkShiftAPI {
 
             // Find user by email
             const users = this.db.findBy('users', { email: email });
-            console.log('Login attempt for email:', email);
-            console.log('Users found:', users.length);
-            console.log('All users in database:', this.db.getTable('users'));
             if (users.length === 0) {
                 return this.sendError('Invalid email or password', 401);
             }
@@ -142,10 +139,7 @@ class WorkShiftAPI {
             }
 
             // Verify password
-            console.log('Verifying password. User password hash:', user.password);
-            console.log('Input password:', password);
             const isValidPassword = await this.verifyPassword(password, user.password);
-            console.log('Password verification result:', isValidPassword);
             if (!isValidPassword) {
                 return this.sendError('Invalid email or password', 401);
             }
