@@ -284,41 +284,6 @@ const Inbox = () => {
                 </div>
               </div>
 
-              {/* Recent Activity */}
-              <div className="sidebar-section">
-                <h3>Recent Activity</h3>
-                <div className="recent-activity-list">
-                  <div className="activity-item-small">
-                    <div className="avatar avatar-sm" style={{background: '#61bd4f'}}>PR</div>
-                    <div className="activity-content-small">
-                      <div className="activity-text-small">Completed "User research analysis"</div>
-                      <div className="activity-time-small">30 minutes ago</div>
-                    </div>
-                  </div>
-                  <div className="activity-item-small">
-                    <div className="avatar avatar-sm" style={{background: '#c377e0'}}>AL</div>
-                    <div className="activity-content-small">
-                      <div className="activity-text-small">Added comment to "API integration"</div>
-                      <div className="activity-time-small">1 hour ago</div>
-                    </div>
-                  </div>
-                  <div className="activity-item-small">
-                    <div className="avatar avatar-sm" style={{background: '#f2d600', color: '#333'}}>ES</div>
-                    <div className="activity-content-small">
-                      <div className="activity-text-small">Moved card to "Review"</div>
-                      <div className="activity-time-small">2 hours ago</div>
-                    </div>
-                  </div>
-                  <div className="activity-item-small">
-                    <div className="avatar avatar-sm" style={{background: '#c377e0'}}>TC</div>
-                    <div className="activity-content-small">
-                      <div className="activity-text-small">Created new board "Q2 Planning"</div>
-                      <div className="activity-time-small">3 hours ago</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Notification Settings */}
               <div className="sidebar-section">
                 <h3>Notification Settings</h3>

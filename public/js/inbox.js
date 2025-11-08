@@ -112,7 +112,16 @@ function updateEmptyStateMessage(filter) {
 }
 
 // Notification actions
+let notificationActionsInitialized = false;
+
 function initializeNotificationActions() {
+    // Prevent multiple event listeners
+    if (notificationActionsInitialized) {
+        return;
+    }
+    
+    notificationActionsInitialized = true;
+    
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('notification-action')) {
             handleNotificationAction(e.target);
@@ -125,8 +134,19 @@ function initializeNotificationActions() {
 }
 
 function handleNotificationAction(button) {
+    if (!button) {
+        console.warn('handleNotificationAction: button is null');
+        return;
+    }
+    
     const action = button.textContent.toLowerCase().trim();
     const notificationItem = button.closest('.notification-item');
+    
+    if (!notificationItem) {
+        console.warn('handleNotificationAction: notificationItem not found');
+        return;
+    }
+    
     const notificationId = notificationItem.getAttribute('data-id');
     
     switch(action) {
@@ -145,6 +165,11 @@ function handleNotificationAction(button) {
 }
 
 function handleNotificationClick(notificationItem, event) {
+    if (!notificationItem) {
+        console.warn('handleNotificationClick: notificationItem is null');
+        return;
+    }
+    
     // Mark as read when clicked (unless clicking on action buttons)
     if (event && !event.target.classList.contains('notification-action')) {
         markAsRead(notificationItem);
@@ -152,6 +177,11 @@ function handleNotificationClick(notificationItem, event) {
 }
 
 function markAsRead(notificationItem) {
+    if (!notificationItem) {
+        console.warn('markAsRead: notificationItem is null');
+        return;
+    }
+    
     if (notificationItem.classList.contains('unread')) {
         notificationItem.classList.remove('unread');
         
@@ -209,8 +239,14 @@ function updateUnreadCount() {
 
 // Modal actions
 function openReplyModal(notificationId) {
+    // Check if a reply modal is already open
+    const existingModal = document.querySelector('.modal.reply-modal');
+    if (existingModal) {
+        return; // Don't open multiple modals
+    }
+    
     const modal = document.createElement('div');
-    modal.className = 'modal';
+    modal.className = 'modal reply-modal';
     modal.innerHTML = `
         <div class="modal-content">
             <div class="modal-header">
@@ -271,7 +307,7 @@ window.sendReply = sendReply;
 function viewCard(notificationId) {
     showNotification('Redirecting to card...', 'info');
     setTimeout(() => {
-        window.location.href = 'http://localhost/workshift2/board.php?id=4';
+        window.location.href = '/board/1';
     }, 500);
 }
 

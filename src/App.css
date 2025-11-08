@@ -263,3 +263,61 @@
     transform: rotate(360deg);
   }
 }
+
+/* Inbox Quick Stats - Make them less bulky */
+.quick-stats {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+
+.stat-item {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.75rem !important;
+  background: var(--bg-secondary, #f8f9fa) !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.stat-item:hover {
+  background: var(--bg-tertiary, #e9ecef) !important;
+}
+
+.stat-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  font-size: 0.875rem !important;
+  color: var(--text-secondary, #666) !important;
+}
+
+.stat-icon {
+  font-size: 0.875rem !important;
+  width: 16px !important;
+}
+
+.stat-value {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: var(--text-primary, #333) !important;
+}
+
+.stat-value.highlight {
+  color: var(--primary-color, #0079bf) !important;
+}
+
+/* Inbox notification message alignment */
+.notification-message {
+  text-align: left !important;
+}
+
+.notification-content {
+  text-align: left !important;
+}
+
+.notification-context {
+  text-align: left !important;
+}
