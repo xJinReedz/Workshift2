@@ -1111,9 +1111,29 @@ async function confirmDeleteChecklistItem() {
         const result = window.db.delete('checklist_items', parseInt(editingChecklistItemId));
         if (result) {
             showNotification('Item deleted successfully', 'success');
-            if (window.currentCardId) {
-                loadChecklistItemsInline(window.currentCardId);
+            
+            // Reload checklist items in modal (for regular checklist modal)
+            if (typeof loadChecklistItems === 'function') {
+                loadChecklistItems();
             }
+            
+            // Update checklist progress
+            if (typeof updateChecklistProgress === 'function') {
+                updateChecklistProgress();
+            }
+            
+            // Reload inline checklist items if in card detail modal
+            if (window.currentCardId) {
+                if (typeof loadChecklistItemsInline === 'function') {
+                    loadChecklistItemsInline(window.currentCardId);
+                }
+            }
+            
+            // Refresh board to update any progress indicators
+            if (typeof renderLists === 'function') {
+                renderLists();
+            }
+            
             closeDeleteChecklistItemModal();
         } else {
             showNotification('Failed to delete item', 'error');
@@ -2148,29 +2168,8 @@ async function toggleChecklistItem(itemId) {
 }
 
 async function deleteChecklistItem(itemId) {
-    // Use window.confirm instead of bare confirm to avoid linting issues
-    if (!window.confirm('Are you sure you want to delete this checklist item?')) {
-        return;
-    }
-    
-    try {
-        window.db.delete('checklist_items', itemId);
-        
-        // Reload checklist items in modal
-        loadChecklistItems();
-        
-        // Update checklist progress
-        updateChecklistProgress();
-        
-        // Refresh board to update progress bars
-        renderLists();
-        
-        showNotification('Checklist item deleted', 'success');
-        
-    } catch (error) {
-        console.error('Error deleting checklist item:', error);
-        showNotification('Failed to delete checklist item', 'error');
-    }
+    // Show delete confirmation modal instead of window.confirm
+    openDeleteChecklistItemModal(itemId);
 }
 
 function closeChecklistModal() {
@@ -2360,9 +2359,22 @@ function deleteCardConfirm() {
         showNotification('No card selected', 'error');
         return;
     }
-
-    if (window.confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
-        deleteCard();
+    
+    // Get card details
+    const card = window.db.findById('cards', parseInt(cardId));
+    if (!card) {
+        showNotification('Card not found', 'error');
+        return;
+    }
+    
+    // Show modal
+    const modal = document.getElementById('delete-card-modal');
+    const cardName = document.getElementById('deleteCardName');
+    
+    if (modal && cardName) {
+        cardName.textContent = card.title || 'Untitled Card';
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
     }
 }
 
@@ -2389,6 +2401,21 @@ async function deleteCard() {
         console.error('Error deleting card:', error);
         showNotification('Failed to delete card', 'error');
     }
+}
+
+// Close delete card modal
+function closeDeleteCardModal() {
+    const modal = document.getElementById('delete-card-modal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+}
+
+// Confirm delete card
+function confirmDeleteCard() {
+    closeDeleteCardModal();
+    deleteCard();
 }
 
 // Initialize list menu functionality
@@ -2634,19 +2661,14 @@ async function deleteAttachment(attachmentId) {
 function showDeleteAttachmentModal(attachmentId, filename) {
     const modal = document.getElementById('delete-attachment-modal');
     if (!modal) {
-        // Create modal if it doesn't exist
-        createDeleteAttachmentModal();
-        return showDeleteAttachmentModal(attachmentId, filename);
+        showNotification('Delete attachment modal not found', 'error');
+        return;
     }
     
     // Update modal content
-    const messageContent = modal.querySelector('.message-content');
-    if (messageContent) {
-        messageContent.innerHTML = `
-            <h4>Delete Attachment</h4>
-            <p>Are you sure you want to delete <strong>"${escapeHtml(filename)}"</strong>?</p>
-            <p>This action cannot be undone.</p>
-        `;
+    const attachmentName = modal.querySelector('#deleteAttachmentName');
+    if (attachmentName) {
+        attachmentName.textContent = filename || 'Unknown file';
     }
     
     // Set up confirmation button
@@ -2669,47 +2691,7 @@ function showDeleteAttachmentModal(attachmentId, filename) {
     document.body.classList.add('modal-open');
 }
 
-// Create delete attachment modal
-function createDeleteAttachmentModal() {
-    const modalHTML = `
-        <div id="delete-attachment-modal" class="modal delete-confirmation-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Delete Attachment</h3>
-                    <button class="modal-close" onclick="closeDeleteAttachmentModal()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="confirmation-message">
-                        <div class="warning-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="message-content">
-                            <h4>Delete Attachment</h4>
-                            <p>Are you sure you want to delete this attachment?</p>
-                            <p>This action cannot be undone.</p>
-                        </div>
-                    </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeDeleteAttachmentModal()">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="confirmDeleteAttachment">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Add backdrop click handler
-    const modal = document.getElementById('delete-attachment-modal');
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeDeleteAttachmentModal();
-            }
-        });
-    }
-}
+// Note: Delete attachment modal is now in Board.jsx - no need to create dynamically
 
 // Close delete attachment modal
 function closeDeleteAttachmentModal() {
@@ -3343,14 +3325,8 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Utility functions
-function showNotification(message, type) {
-    if (window.WorkShift?.showNotification) {
-        window.WorkShift.showNotification(message, type);
-    } else {
-        console.log(type + ": " + message);
-    }
-}
+// Note: showNotification function is provided by shared.js which loads before this file
+/* global showNotification */
 
 // Make functions globally accessible
 window.initializeBoard = initializeBoard;
@@ -4162,5 +4138,10 @@ window.stopCountdownTimers = stopCountdownTimers;
 window.showAttachmentUpload = showAttachmentUpload;
 window.downloadAttachment = downloadAttachment;
 window.deleteAttachment = deleteAttachment;
+window.closeDeleteCardModal = closeDeleteCardModal;
+window.confirmDeleteCard = confirmDeleteCard;
+window.closeDeleteChecklistItemModal = closeDeleteChecklistItemModal;
+window.confirmDeleteChecklistItem = confirmDeleteChecklistItem;
+window.openDeleteChecklistItemModal = openDeleteChecklistItemModal;
 
 console.log("Board-modern.js loaded successfully");

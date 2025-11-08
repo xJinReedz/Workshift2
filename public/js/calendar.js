@@ -3,14 +3,8 @@
 let currentDate = new Date(2025, 9, 27); // October 27, 2025 (month is 0-indexed)
 let currentView = 'monthly';
 
-// Fallback functions for missing global functions
-function showNotification(message, type) {
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    // Fallback to alert if no notification system is available
-    if (window.showNotification && typeof window.showNotification === 'function') {
-        window.showNotification(message, type);
-    }
-}
+// Note: showNotification function is provided by shared.js which loads before this file  
+/* global showNotification */
 
 function openModal(modalId) {
     const modal = document.getElementById(modalId);

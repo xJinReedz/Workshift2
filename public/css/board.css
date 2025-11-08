@@ -1999,6 +1999,7 @@
   background: none;
   padding: 0;
   word-break: break-word;
+  text-align: left !important;
 }
 
 .card-checklist-progress {
@@ -2506,6 +2507,7 @@
   font-size: 0.8rem;
   color: var(--text-secondary);
   line-height: 1.3;
+  text-align: left !important;
 }
 
 /* Add card button */
@@ -2630,7 +2632,7 @@
 }
 
 .card-modal-body {
-  padding: 1.5rem;
+  padding: 1.5rem 1rem 1.5rem 1.5rem;
 }
 
 .card-modal .card-due-info {
@@ -4018,6 +4020,7 @@
   .card-description {
     font-size: 0.825rem;
     line-height: 1.4;
+    text-align: left !important;
   }
   
   .card-modal .modal-content {
@@ -5292,17 +5295,18 @@
 
 .card-details-layout {
     display: flex;
-    gap: 1.5rem;
+    gap: 1rem;
     padding: 0;
 }
 
 .card-main-content {
     flex: 1;
     min-width: 0;
+    margin-right: 0.5rem;
 }
 
 .card-sidebar {
-    width: 240px;
+    width: 200px;
     flex-shrink: 0;
 }
 
@@ -5333,6 +5337,13 @@
     font-weight: 600;
 }
 
+.section-content {
+    margin-left: 0;
+    padding-left: 0;
+    text-align: left;
+    width: 100%;
+}
+
 textarea.card-description {
     width: 100%;
     min-height: 80px;
@@ -5341,6 +5352,18 @@ textarea.card-description {
     border-radius: 6px;
     resize: vertical;
     font-family: inherit;
+    text-align: left !important;
+    box-sizing: border-box;
+    direction: ltr;
+}
+
+.card-modal textarea.card-description {
+    text-align: left !important;
+    direction: ltr;
+}
+
+.modal .card-description {
+    text-align: left !important;
 }
 
 textarea.card-description:focus {
@@ -6308,6 +6331,112 @@ textarea.card-description:focus {
     transition: opacity 0.2s ease;
 }
 
+/* Delete Confirmation Modals */
+.delete-confirmation-modal .modal-content {
+    max-width: 450px;
+    width: 90%;
+}
+
+.delete-confirmation-modal .confirmation-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.delete-confirmation-modal .warning-icon {
+    color: #f59e0b;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.delete-confirmation-modal .message-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.delete-confirmation-modal .message-content p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.delete-confirmation-modal .message-content p:last-child {
+    margin-bottom: 0;
+}
+
+.delete-confirmation-modal .modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}
+
+.delete-confirmation-modal .btn {
+    min-width: 80px;
+}
+
 .checklist-item-inline:hover .item-actions {
     opacity: 1;
+}
+
+/* Force left alignment for all card descriptions - highest specificity */
+.card-modal .section-content textarea.card-description,
+.modal .section-content textarea.card-description,
+.card-modal textarea#cardDescription,
+textarea#cardDescription,
+#cardDescription {
+    text-align: left !important;
+    direction: ltr !important;
+}
+
+/* Force left alignment for card description text display */
+.card .card-description,
+.card-item .card-description,
+div.card-description {
+    text-align: left !important;
+    direction: ltr !important;
+}
+
+/* Override any browser defaults for textarea alignment */
+textarea {
+    text-align: left !important;
+}
+
+/* Specific override for the card description modal */
+.card-modal-body .section-content {
+    text-align: left !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+}
+
+/* Ensure placeholder text is also left-aligned */
+textarea.card-description::placeholder,
+#cardDescription::placeholder {
+    text-align: left !important;
+    direction: ltr !important;
+}
+
+/* Ultimate override - highest specificity possible for card description alignment */
+body .modal.card-modal .modal-content .modal-body .card-details-layout .card-main-content .card-section .section-content textarea.card-description,
+body .modal .modal-content .modal-body textarea#cardDescription,
+body div#card-detail-modal textarea#cardDescription,
+body textarea[id="cardDescription"],
+body #cardDescription {
+    text-align: left !important;
+    direction: ltr !important;
+    writing-mode: horizontal-tb !important;
+}
+
+/* Force left alignment on any element with card-description class */
+body .card-description,
+body div.card-description,
+body span.card-description,
+body p.card-description,
+body textarea.card-description {
+    text-align: start !important;
+    text-align: -webkit-left !important;
+    text-align: -moz-left !important;
+    text-align: left !important;
+    direction: ltr !important;
 }

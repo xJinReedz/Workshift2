@@ -3,14 +3,8 @@
 let currentFilter = 'all';
 // let notifications = []; // Store notification data - will be used in future features
 
-// Helper function for missing global functions
-function showNotification(message, type) {
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    // Fallback to alert if no notification system is available
-    if (window.showNotification && typeof window.showNotification === 'function') {
-        window.showNotification(message, type);
-    }
-}
+// Note: showNotification function is provided by shared.js which loads before this file
+/* global showNotification */
 
 // Removed auto-initialization - React components will call these functions manually
 // document.addEventListener('DOMContentLoaded', function() {

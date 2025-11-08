@@ -1189,6 +1189,58 @@ const Board = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Attachment Modal */}
+      <div id="delete-attachment-modal" className="modal delete-confirmation-modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Delete Attachment</h3>
+            <button className="modal-close" onClick={() => window.closeDeleteAttachmentModal && window.closeDeleteAttachmentModal()}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="confirmation-message">
+              <div className="warning-icon">
+                <i className="fas fa-exclamation-triangle"></i>
+              </div>
+              <div className="message-content">
+                <h4>Delete Attachment</h4>
+                <p>Are you sure you want to delete "<span id="deleteAttachmentName">Activity2 (1).pdf</span>"?</p>
+                <p>This action cannot be undone.</p>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button className="btn btn-secondary" onClick={() => window.closeDeleteAttachmentModal && window.closeDeleteAttachmentModal()}>Cancel</button>
+              <button className="btn btn-danger" id="confirmDeleteAttachment" onClick={() => window.confirmDeleteAttachment && window.confirmDeleteAttachment()}>Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Card Modal */}
+      <div id="delete-card-modal" className="modal delete-confirmation-modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h3>Delete Card</h3>
+            <button className="modal-close" onClick={() => window.closeDeleteCardModal && window.closeDeleteCardModal()}>&times;</button>
+          </div>
+          <div className="modal-body">
+            <div className="confirmation-message">
+              <div className="warning-icon">
+                <i className="fas fa-exclamation-triangle"></i>
+              </div>
+              <div className="message-content">
+                <h4>Delete this card?</h4>
+                <p>Card: "<span id="deleteCardName">Card Title</span>"</p>
+                <p>This action cannot be undone and will remove all attachments, comments, and checklist items.</p>
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button className="btn btn-secondary" onClick={() => window.closeDeleteCardModal && window.closeDeleteCardModal()}>Cancel</button>
+              <button className="btn btn-danger" id="confirmDeleteCard" onClick={() => window.confirmDeleteCard && window.confirmDeleteCard()}>Delete Card</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

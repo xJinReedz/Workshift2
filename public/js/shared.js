@@ -328,6 +328,9 @@ function generateAvatar(name) {
     };
 }
 
+// Mark that the real notification system is available
+window.hasRealNotificationSystem = true;
+
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
@@ -553,3 +556,6 @@ window.WorkShift = {
 
 // Make handleLogout globally available
 window.handleLogout = handleLogout;
+
+// Make showNotification globally available
+window.showNotification = showNotification;
