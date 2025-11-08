@@ -233,7 +233,7 @@ function renderLists() {
                 }
 
                 return `
-                    <div class="card-item" data-card-id="${card.id}">
+                    <div class="card-item" data-card-id="${card.id}" style="cursor: move;">
                         ${labelsHtml}
                         <div class="card-title">${escapeHtml(card.title)}</div>
                         ${card.description ? `<div class="card-description">${escapeHtml(card.description.length > 80 ? card.description.substring(0, 80) + '...' : card.description)}</div>` : ''}
@@ -307,7 +307,8 @@ function initializeBoardInteractions() {
     initializeAddCardForms();
     initializeListMenus();
     initializeBoardTitleEditing();
-    initializeDragAndDrop(); // Enable drag and drop for cards
+    // Enable drag and drop after lists/cards are rendered
+    initializeDragAndDrop();
     startManilaClock();
     
     // Start countdown timers for due dates
@@ -316,295 +317,255 @@ function initializeBoardInteractions() {
     console.log('Board interactions initialized');
 }
 
+// Initialize drag and drop for moving cards between lists
+function initializeDragAndDrop() {
+    try {
+        // Make cards draggable and attach dragstart/dragend
+        const cards = document.querySelectorAll('.card-item');
+        console.log('Initializing drag and drop for', cards.length, 'cards');
+        
+        if (cards.length === 0) {
+            console.warn('No cards found to initialize drag and drop');
+            return;
+        }
+        
+        cards.forEach((card, index) => {
+            // Force draggable attribute
+            card.setAttribute('draggable', 'true');
+            
+            // Force CSS styles to override any conflicts
+            card.style.cursor = 'grab';
+            card.style.userSelect = 'none';
+            card.style.webkitUserSelect = 'none';
+            card.style.touchAction = 'none'; // For touch devices
+            
+            // Make sure child elements don't interfere
+            const children = card.querySelectorAll('*');
+            children.forEach(child => {
+                child.style.pointerEvents = 'none';
+            });
+            
+            console.log(`✅ Card ${index + 1} configured for dragging:`, {
+                cardId: card.getAttribute('data-card-id'),
+                draggable: card.getAttribute('draggable'),
+                cursor: card.style.cursor,
+                childrenDisabled: children.length
+            });
+
+            // remove before adding to avoid duplicate handlers
+            card.removeEventListener('dragstart', cardDragStart);
+            card.removeEventListener('dragend', cardDragEnd);
+            card.removeEventListener('mousedown', cardMouseDown);
+            
+            card.addEventListener('dragstart', cardDragStart, false);
+            card.addEventListener('dragend', cardDragEnd, false);
+            card.addEventListener('mousedown', cardMouseDown, false);
+        });
+
+        // Attach dragover/drop handlers to each list body
+        const listBodies = document.querySelectorAll('.list-body');
+        console.log('Initializing drop handlers for', listBodies.length, 'list bodies');
+        
+        listBodies.forEach((listBody, index) => {
+            console.log(`Setting up drop handlers for list body ${index + 1}:`, listBody);
+            
+            listBody.removeEventListener('dragover', listDragOver);
+            listBody.removeEventListener('dragenter', listDragEnter);
+            listBody.removeEventListener('dragleave', listDragLeave);
+            listBody.removeEventListener('drop', listDrop);
+
+            listBody.addEventListener('dragover', listDragOver);
+            listBody.addEventListener('dragenter', listDragEnter);
+            listBody.addEventListener('dragleave', listDragLeave);
+            listBody.addEventListener('drop', listDrop);
+        });
+        
+        console.log('Drag and drop initialization complete');
+    } catch (err) {
+        console.error('Error initializing drag and drop:', err);
+    }
+}
+
+// Mouse down handler to help with drag initiation
+function cardMouseDown(e) {
+    const card = this;
+    const cardId = card.getAttribute('data-card-id');
+    console.log('Mouse down on card:', cardId);
+    card.style.cursor = 'grabbing';
+    
+    // Important: Don't prevent default to allow drag to start
+    // Just log for debugging
+}
+
+// Drag handlers
+function cardDragStart(e) {
+    // Get the card element - might be triggered from a child element
+    let cardElement = e.target;
+    if (!cardElement.classList.contains('card-item')) {
+        cardElement = cardElement.closest('.card-item');
+    }
+    
+    if (!cardElement) {
+        console.error('No card element found for drag start');
+        return;
+    }
+    
+    const cardId = cardElement.getAttribute('data-card-id');
+    if (!cardId) {
+        console.error('No card ID found for drag start');
+        return;
+    }
+    
+    // Set flag to prevent click handler from firing
+    cardElement.dragStarted = true;
+    
+    e.dataTransfer.effectAllowed = 'move';
+    try {
+        e.dataTransfer.setData('text/plain', cardId);
+        e.dataTransfer.setData('text/html', cardElement.outerHTML);
+    } catch (err) {
+        console.error('Error setting drag data:', err);
+    }
+    
+    cardElement.classList.add('dragging');
+    cardElement.style.cursor = 'grabbing';
+    cardElement.style.opacity = '0.6';
+    
+    console.log('✅ Drag started successfully for card:', cardId);
+}
+
+function cardDragEnd(e) {
+    // Get the card element
+    let cardElement = e.target;
+    if (!cardElement.classList.contains('card-item')) {
+        cardElement = cardElement.closest('.card-item');
+    }
+    
+    if (cardElement) {
+        cardElement.classList.remove('dragging');
+        cardElement.style.cursor = 'grab'; // Reset cursor
+        cardElement.style.opacity = '1'; // Reset opacity
+    }
+    
+    // Remove any visual drop indicators
+    document.querySelectorAll('.list-body.drag-over').forEach(el => el.classList.remove('drag-over'));
+    
+    console.log('✅ Drag ended');
+}
+
+function listDragOver(e) {
+    e.preventDefault(); // allow drop
+    e.dataTransfer.dropEffect = 'move';
+}
+
+function listDragEnter(e) {
+    e.preventDefault();
+    this.classList.add('drag-over');
+    console.log('Drag enter on list');
+}
+
+function listDragLeave(e) {
+    this.classList.remove('drag-over');
+    console.log('Drag leave from list');
+}
+
+async function listDrop(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+    
+    console.log('Drop event triggered');
+
+    let cardId = null;
+    try {
+        cardId = e.dataTransfer.getData('text/plain');
+    } catch (err) {
+        console.warn('Could not read dataTransfer data:', err);
+    }
+
+    // Fallback: sometimes drag target element can provide dragging class
+    if (!cardId) {
+        const dragging = document.querySelector('.card-item.dragging');
+        if (dragging) cardId = dragging.getAttribute('data-card-id');
+    }
+
+    console.log('Card ID from drop:', cardId);
+
+    if (!cardId) {
+        console.error('No card ID found in drop event');
+        return;
+    }
+
+    const targetListElem = this.closest('.list');
+    if (!targetListElem) {
+        console.error('No target list found');
+        return;
+    }
+    const newListId = targetListElem.getAttribute('data-list-id');
+    if (!newListId) {
+        console.error('No list ID found on target');
+        return;
+    }
+
+    console.log('Moving card', cardId, 'to list', newListId);
+
+    // Update card's list_id and position in DB/API
+    try {
+        const newPosition = getNextCardPosition(newListId);
+
+        if (window.api && typeof window.api.updateCard === 'function') {
+            console.log('Using API to update card');
+            const resp = await window.api.updateCard({ card_id: parseInt(cardId), list_id: parseInt(newListId), position: newPosition });
+            if (!resp || !resp.success) {
+                console.warn('updateCard did not succeed, response:', resp);
+            } else {
+                console.log('Card updated successfully via API');
+            }
+        } else if (window.db && typeof window.db.update === 'function') {
+            // fallback to local db update if API not present
+            console.log('Using local DB to update card');
+            window.db.update('cards', parseInt(cardId), { list_id: parseInt(newListId), position: newPosition });
+            console.log('Card updated successfully via local DB');
+        } else {
+            console.error('No API or DB available to update card');
+        }
+    } catch (err) {
+        console.error('Error updating card on drop:', err);
+    }
+
+    // Re-render lists to reflect changes
+    console.log('Re-rendering lists...');
+    renderLists();
+}
+
 // Initialize card clicks
 function initializeCardClicks() {
     const cards = document.querySelectorAll('.card-item');
     cards.forEach(card => {
         card.removeEventListener('click', cardClickHandler);
         card.addEventListener('click', cardClickHandler);
-        // Don't set cursor here - let drag initialization handle it
+        card.style.cursor = 'pointer';
     });
 }
 
-// Card click handler - modified to work with drag
+// Card click handler - allow dragging while still supporting clicks
 function cardClickHandler(e) {
-    // Don't prevent default or stop propagation - let drag events work
-    const cardId = this.getAttribute('data-card-id');
+    // Don't open modal if this was part of a drag operation
+    if (this.dragStarted) {
+        this.dragStarted = false; // Reset flag
+        return;
+    }
     
-    // Use a small delay to distinguish click from drag start
+    // Small delay to distinguish between click and drag
     setTimeout(() => {
-        if (!this.classList.contains('dragging')) {
+        if (!this.dragStarted) {
+            const cardId = this.getAttribute('data-card-id');
             if (cardId) {
                 openCardModal(parseInt(cardId));
             } else {
                 console.error('No card ID found on clicked element');
             }
         }
-    }, 100);
-}
-
-// Initialize drag and drop for cards
-function initializeDragAndDrop() {
-    console.log('🔥 Initializing drag and drop');
-    
-    const cards = document.querySelectorAll('.card-item');
-    console.log(`Found ${cards.length} cards to make draggable`);
-    
-    cards.forEach(card => {
-        // Make card draggable
-        card.setAttribute('draggable', 'true');
-        card.style.cursor = 'grab';
-        
-        // Remove any existing event listeners to avoid conflicts
-        card.removeEventListener('dragstart', handleDragStart);
-        card.removeEventListener('dragend', handleDragEnd);
-        
-        // Add drag event listeners
-        card.addEventListener('dragstart', handleDragStart);
-        card.addEventListener('dragend', handleDragEnd);
-        
-        console.log('✓ Card', card.dataset.cardId, 'is now draggable');
-    });
-    
-    // Setup drop zones on lists (using actual class name from HTML)
-    const listBodies = document.querySelectorAll('.list-body');
-    console.log(`Setting up ${listBodies.length} drop zones on .list-body elements`);
-    
-    listBodies.forEach(listBody => {
-        listBody.addEventListener('dragover', handleDragOver);
-        listBody.addEventListener('dragenter', handleDragEnter);
-        listBody.addEventListener('dragleave', handleDragLeave);
-        listBody.addEventListener('drop', handleDrop);
-        
-        console.log('✓ Drop zone set up on:', listBody);
-    });
-    
-    console.log('✅ Drag and drop initialized successfully');
-}
-
-let draggedCard = null;
-let sourceListId = null;
-
-// Handle drag start
-function handleDragStart(e) {
-    console.log('🚀 DRAG START EVENT FIRED!', {
-        cardId: this.dataset.cardId,
-        element: this
-    });
-    
-    draggedCard = this;
-    sourceListId = this.closest('.list').dataset.listId;
-    
-    this.classList.add('dragging');
-    this.style.cursor = 'grabbing';
-    
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', this.dataset.cardId);
-    
-    console.log('✅ Drag data set:', {
-        cardId: this.dataset.cardId,
-        sourceListId: sourceListId
-    });
-}
-
-// Handle drag end
-function handleDragEnd(e) {
-    this.classList.remove('dragging');
-    this.style.cursor = 'grab';
-    
-    // Remove all drag-over classes
-    document.querySelectorAll('.list-cards').forEach(list => {
-        list.classList.remove('drag-over');
-    });
-    
-    console.log('🏁 Drag ended');
-    draggedCard = null;
-    sourceListId = null;
-}
-
-// Handle drag over
-function handleDragOver(e) {
-    console.log('🔄 Drag over detected on:', this);
-    if (e.preventDefault) {
-        e.preventDefault(); // Allows drop
-    }
-    e.dataTransfer.dropEffect = 'move';
-    return false;
-}
-
-// Handle drag enter
-function handleDragEnter(e) {
-    console.log('➡️ Drag enter on:', this);
-    this.classList.add('drag-over');
-}
-
-// Handle drag leave
-function handleDragLeave(e) {
-    console.log('⬅️ Drag leave from:', this);
-    // Only remove if we're leaving the list, not a child element
-    if (e.target === this) {
-        this.classList.remove('drag-over');
-    }
-}
-
-// Handle drop
-async function handleDrop(e) {
-    console.log('🎯 DROP EVENT TRIGGERED on:', this);
-    if (e.stopPropagation) {
-        e.stopPropagation(); // Stops browser from redirecting
-    }
-    e.preventDefault();
-    
-    this.classList.remove('drag-over');
-    
-    if (!draggedCard) {
-        console.warn('No dragged card found');
-        return false;
-    }
-    
-    const targetList = this.closest('.list');
-    const targetListId = targetList.dataset.listId;
-    const cardId = draggedCard.dataset.cardId;
-    
-    console.log('📥 Drop:', {
-        cardId: cardId,
-        fromList: sourceListId,
-        toList: targetListId
-    });
-    
-    // Don't do anything if dropped in same list
-    if (sourceListId === targetListId) {
-        console.log('Dropped in same list, no action needed');
-        return false;
-    }
-    
-    try {
-        // Update card's list_id in database
-        if (window.api && window.api.updateCard) {
-            const response = await window.api.updateCard({
-                card_id: parseInt(cardId),
-                list_id: parseInt(targetListId)
-            });
-            
-            if (response.success) {
-                console.log('✅ Card moved to new list in database');
-                // Refresh the board
-                await renderLists();
-                showNotification('Card moved successfully!', 'success');
-            } else {
-                console.error('API returned error:', response);
-                showNotification('Failed to move card: ' + (response.error || 'Unknown error'), 'error');
-            }
-        } else if (window.db) {
-            await window.db.update('cards', parseInt(cardId), { list_id: parseInt(targetListId) });
-            console.log('✅ Card moved to new list in local database');
-            // Refresh the board
-            await renderLists();
-            showNotification('Card moved successfully!', 'success');
-        }
-    } catch (error) {
-        console.error('Error moving card:', error);
-        showNotification('Failed to move card: ' + error.message, 'error');
-    }
-    
-    return false;
-}
-
-// Reset board to have only To Do list with test cards
-function resetToDoOnlyBoard() {
-    console.log('🔄 Resetting board to To Do only...');
-    
-    // Create test data structure
-    const testBoard = {
-        id: 1,
-        title: "Test Board",
-        lists: [
-            {
-                id: 1,
-                title: "To Do",
-                board_id: 1,
-                cards: [
-                    { id: 1, title: "Test Card 1", description: "Drag me!", list_id: 1 },
-                    { id: 2, title: "Test Card 2", description: "Or drag me!", list_id: 1 },
-                    { id: 3, title: "Test Card 3", description: "I'm draggable too!", list_id: 1 }
-                ]
-            },
-            {
-                id: 2,
-                title: "In Progress",
-                board_id: 1,
-                cards: []
-            }
-        ]
-    };
-    
-    // Render this test board using correct HTML structure
-    const boardContainer = document.querySelector('.board-lists');
-    if (boardContainer) {
-        const listsHtml = testBoard.lists.map(list => `
-            <div class="list" data-list-id="${list.id}">
-                <div class="list-header">
-                    <h3>${list.title}</h3>
-                </div>
-                <div class="list-body" id="list-${list.id}-cards">
-                    ${list.cards.map(card => `
-                        <div class="card-item" data-card-id="${card.id}">
-                            <div class="card-title">${card.title}</div>
-                            <div class="card-description">${card.description}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
-        
-        boardContainer.innerHTML = listsHtml;
-        
-        // Re-initialize drag and drop
-        initializeDragAndDrop();
-        initializeCardClicks();
-        
-        console.log('✅ Test board created with draggable cards!');
-    }
-}
-
-// Debug function to test drag functionality
-function testDragFunctionality() {
-    console.log('🔍 Testing drag functionality...');
-    
-    const cards = document.querySelectorAll('.card-item');
-    console.log(`Found ${cards.length} cards`);
-    
-    cards.forEach((card, index) => {
-        console.log(`Card ${index + 1}:`, {
-            id: card.dataset.cardId,
-            draggable: card.getAttribute('draggable'),
-            cursor: window.getComputedStyle(card).cursor,
-            userSelect: window.getComputedStyle(card).userSelect
-        });
-    });
-    
-    // Test drop zones
-    const dropZones = document.querySelectorAll('.list-body');
-    console.log(`\nFound ${dropZones.length} drop zones (.list-body)`);
-    
-    dropZones.forEach((zone, index) => {
-        const parentList = zone.closest('.list');
-        console.log(`Drop Zone ${index + 1}:`, {
-            listId: parentList ? parentList.dataset.listId : 'No parent list',
-            className: zone.className,
-            id: zone.id
-        });
-    });
-    
-    // Check if lists exist
-    const lists = document.querySelectorAll('.list');
-    console.log(`\nFound ${lists.length} lists (.list)`);
-    lists.forEach((list, index) => {
-        console.log(`List ${index + 1}:`, {
-            listId: list.dataset.listId,
-            title: list.querySelector('h3')?.textContent || 'No title'
-        });
-    });
+    }, 50);
 }
 
 // Open card modal and load card details
@@ -1381,29 +1342,9 @@ async function confirmDeleteChecklistItem() {
         const result = window.db.delete('checklist_items', parseInt(editingChecklistItemId));
         if (result) {
             showNotification('Item deleted successfully', 'success');
-            
-            // Reload checklist items in modal (for regular checklist modal)
-            if (typeof loadChecklistItems === 'function') {
-                loadChecklistItems();
-            }
-            
-            // Update checklist progress
-            if (typeof updateChecklistProgress === 'function') {
-                updateChecklistProgress();
-            }
-            
-            // Reload inline checklist items if in card detail modal
             if (window.currentCardId) {
-                if (typeof loadChecklistItemsInline === 'function') {
-                    loadChecklistItemsInline(window.currentCardId);
-                }
+                loadChecklistItemsInline(window.currentCardId);
             }
-            
-            // Refresh board to update any progress indicators
-            if (typeof renderLists === 'function') {
-                renderLists();
-            }
-            
             closeDeleteChecklistItemModal();
         } else {
             showNotification('Failed to delete item', 'error');
@@ -2438,8 +2379,29 @@ async function toggleChecklistItem(itemId) {
 }
 
 async function deleteChecklistItem(itemId) {
-    // Show delete confirmation modal instead of window.confirm
-    openDeleteChecklistItemModal(itemId);
+    // Use window.confirm instead of bare confirm to avoid linting issues
+    if (!window.confirm('Are you sure you want to delete this checklist item?')) {
+        return;
+    }
+    
+    try {
+        window.db.delete('checklist_items', itemId);
+        
+        // Reload checklist items in modal
+        loadChecklistItems();
+        
+        // Update checklist progress
+        updateChecklistProgress();
+        
+        // Refresh board to update progress bars
+        renderLists();
+        
+        showNotification('Checklist item deleted', 'success');
+        
+    } catch (error) {
+        console.error('Error deleting checklist item:', error);
+        showNotification('Failed to delete checklist item', 'error');
+    }
 }
 
 function closeChecklistModal() {
@@ -2629,22 +2591,9 @@ function deleteCardConfirm() {
         showNotification('No card selected', 'error');
         return;
     }
-    
-    // Get card details
-    const card = window.db.findById('cards', parseInt(cardId));
-    if (!card) {
-        showNotification('Card not found', 'error');
-        return;
-    }
-    
-    // Show modal
-    const modal = document.getElementById('delete-card-modal');
-    const cardName = document.getElementById('deleteCardName');
-    
-    if (modal && cardName) {
-        cardName.textContent = card.title || 'Untitled Card';
-        modal.classList.add('active');
-        document.body.classList.add('modal-open');
+
+    if (window.confirm('Are you sure you want to delete this card? This action cannot be undone.')) {
+        deleteCard();
     }
 }
 
@@ -2671,21 +2620,6 @@ async function deleteCard() {
         console.error('Error deleting card:', error);
         showNotification('Failed to delete card', 'error');
     }
-}
-
-// Close delete card modal
-function closeDeleteCardModal() {
-    const modal = document.getElementById('delete-card-modal');
-    if (modal) {
-        modal.classList.remove('active');
-        document.body.classList.remove('modal-open');
-    }
-}
-
-// Confirm delete card
-function confirmDeleteCard() {
-    closeDeleteCardModal();
-    deleteCard();
 }
 
 // Initialize list menu functionality
@@ -2931,14 +2865,19 @@ async function deleteAttachment(attachmentId) {
 function showDeleteAttachmentModal(attachmentId, filename) {
     const modal = document.getElementById('delete-attachment-modal');
     if (!modal) {
-        showNotification('Delete attachment modal not found', 'error');
-        return;
+        // Create modal if it doesn't exist
+        createDeleteAttachmentModal();
+        return showDeleteAttachmentModal(attachmentId, filename);
     }
     
     // Update modal content
-    const attachmentName = modal.querySelector('#deleteAttachmentName');
-    if (attachmentName) {
-        attachmentName.textContent = filename || 'Unknown file';
+    const messageContent = modal.querySelector('.message-content');
+    if (messageContent) {
+        messageContent.innerHTML = `
+            <h4>Delete Attachment</h4>
+            <p>Are you sure you want to delete <strong>"${escapeHtml(filename)}"</strong>?</p>
+            <p>This action cannot be undone.</p>
+        `;
     }
     
     // Set up confirmation button
@@ -2961,7 +2900,47 @@ function showDeleteAttachmentModal(attachmentId, filename) {
     document.body.classList.add('modal-open');
 }
 
-// Note: Delete attachment modal is now in Board.jsx - no need to create dynamically
+// Create delete attachment modal
+function createDeleteAttachmentModal() {
+    const modalHTML = `
+        <div id="delete-attachment-modal" class="modal delete-confirmation-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Delete Attachment</h3>
+                    <button class="modal-close" onclick="closeDeleteAttachmentModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="confirmation-message">
+                        <div class="warning-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="message-content">
+                            <h4>Delete Attachment</h4>
+                            <p>Are you sure you want to delete this attachment?</p>
+                            <p>This action cannot be undone.</p>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeDeleteAttachmentModal()">Cancel</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteAttachment">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Add backdrop click handler
+    const modal = document.getElementById('delete-attachment-modal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeDeleteAttachmentModal();
+            }
+        });
+    }
+}
 
 // Close delete attachment modal
 function closeDeleteAttachmentModal() {
@@ -3595,8 +3574,127 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Note: showNotification function is provided by shared.js which loads before this file
-/* global showNotification */
+// Utility functions
+function showNotification(message, type) {
+    if (window.WorkShift?.showNotification) {
+        window.WorkShift.showNotification(message, type);
+    } else {
+        console.log(type + ": " + message);
+    }
+}
+
+// Debug function to reset board to only have "To Do" list with sample cards
+function resetToDoOnlyBoard() {
+    console.log('Resetting board to only have "To Do" list...');
+    
+    if (!window.db) {
+        console.error('Database not available');
+        return;
+    }
+    
+    // Clear existing lists and cards for this board
+    const currentBoardId = 1;
+    const existingLists = window.db.findBy('lists', { board_id: currentBoardId });
+    
+    // Delete existing cards first
+    existingLists.forEach(list => {
+        const cards = window.db.findBy('cards', { list_id: list.id });
+        cards.forEach(card => {
+            window.db.delete('cards', card.id);
+        });
+    });
+    
+    // Delete existing lists
+    existingLists.forEach(list => {
+        window.db.delete('lists', list.id);
+    });
+    
+    // Create only "To Do" list
+    const todoList = window.db.insert('lists', {
+        board_id: currentBoardId,
+        title: 'To Do',
+        position: 1
+    });
+    
+    console.log('Created To Do list with ID:', todoList.id);
+    
+    // Add sample cards
+    const sampleCards = [
+        {
+            list_id: todoList.id,
+            title: 'Create wireframes for homepage',
+            description: 'Design low-fidelity wireframes for the new homepage layout including header, hero section, and main content areas.',
+            position: 1,
+            due_date: '2025-11-15 23:59:00',
+            is_completed: false,
+            created_by: 1
+        },
+        {
+            list_id: todoList.id,
+            title: 'Competitor analysis',
+            description: 'Research competitor websites and analyze their design patterns, user flows, and features.',
+            position: 2,
+            due_date: '2025-11-20 23:59:00',
+            is_completed: false,
+            created_by: 1
+        },
+        {
+            list_id: todoList.id,
+            title: 'Test drag and drop',
+            description: 'Test the new drag and drop functionality for moving cards between lists.',
+            position: 3,
+            is_completed: false,
+            created_by: 1
+        }
+    ];
+    
+    sampleCards.forEach(cardData => {
+        const card = window.db.insert('cards', cardData);
+        console.log('Created card:', card.title);
+    });
+    
+    console.log('Board reset complete! Refreshing...');
+    
+    // Refresh the board
+    renderLists();
+}
+
+// Debug function to manually test drag functionality
+function debugDragAndDrop() {
+    console.log('=== 🔍 DRAG DEBUG START ===');
+    
+    const cards = document.querySelectorAll('.card-item');
+    console.log(`📋 Found ${cards.length} cards`);
+    
+    if (cards.length === 0) {
+        console.error('❌ No cards found! Make sure you have cards on the board.');
+        console.log('💡 Try running: resetToDoOnlyBoard()');
+        return;
+    }
+    
+    cards.forEach((card, i) => {
+        const computedStyle = window.getComputedStyle(card);
+        const children = card.querySelectorAll('*');
+        
+        console.log(`\n📦 Card ${i + 1}:`, {
+            cardId: card.getAttribute('data-card-id'),
+            draggable: card.getAttribute('draggable'),
+            cursor: computedStyle.cursor,
+            userSelect: computedStyle.userSelect,
+            pointerEvents: computedStyle.pointerEvents,
+            childElements: children.length,
+            childrenPointerEvents: children.length > 0 ? window.getComputedStyle(children[0]).pointerEvents : 'N/A'
+        });
+    });
+    
+    // Force re-initialize drag and drop
+    console.log('\n🔄 Force reinitializing drag and drop...');
+    initializeDragAndDrop();
+    
+    console.log('\n✅ Drag system reinitialized!');
+    console.log('💡 Now try dragging a card - you should see console messages.');
+    console.log('=== 🔍 DRAG DEBUG END ===\n');
+}
 
 // Make functions globally accessible
 window.initializeBoard = initializeBoard;
@@ -3605,6 +3703,8 @@ window.closeCardModal = closeCardModal;
 window.handleAddCard = handleAddCard;
 window.closeModal = closeModal;
 window.openLabelsModal = openLabelsModal;
+window.resetToDoOnlyBoard = resetToDoOnlyBoard;
+window.debugDragAndDrop = debugDragAndDrop;
 window.closeLabelsModal = closeLabelsModal;
 window.createLabel = createLabel;
 window.toggleLabel = toggleLabel;
@@ -4408,10 +4508,5 @@ window.stopCountdownTimers = stopCountdownTimers;
 window.showAttachmentUpload = showAttachmentUpload;
 window.downloadAttachment = downloadAttachment;
 window.deleteAttachment = deleteAttachment;
-window.closeDeleteCardModal = closeDeleteCardModal;
-window.confirmDeleteCard = confirmDeleteCard;
-window.closeDeleteChecklistItemModal = closeDeleteChecklistItemModal;
-window.confirmDeleteChecklistItem = confirmDeleteChecklistItem;
-window.openDeleteChecklistItemModal = openDeleteChecklistItemModal;
 
 console.log("Board-modern.js loaded successfully");
