@@ -1,5 +1,4 @@
-﻿<<<<<<< HEAD
-// Board JavaScript - WorkShift Board Management (Fixed Implementation)
+﻿// Board JavaScript - WorkShift Board Management (Fixed Implementation)
 let currentBoard = null;
 let currentBoardId = null;
 

@@ -14,7 +14,10 @@ const Board = () => {
       } else {
         // Initialize board with the ID from URL params
         if (window.initializeBoard) {
-          window.initializeBoard(boardId || 1);
+          // Add a small delay to ensure DOM is fully rendered
+          setTimeout(() => {
+            window.initializeBoard(boardId || 1);
+          }, 100);
         }
         
         // Initialize tab counts after a short delay to ensure DOM is ready
