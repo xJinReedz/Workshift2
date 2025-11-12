@@ -1,3 +1,4 @@
+﻿<<<<<<< HEAD
 // Board JavaScript - WorkShift Board Management (Fixed Implementation)
 let currentBoard = null;
 let currentBoardId = null;
@@ -250,7 +251,7 @@ function renderLists() {
                         <div class="list-actions">
                             <button class="list-menu-btn" data-list-id="${list.id}" title="List options">
                                 <i class="fas fa-ellipsis-h"></i>
-                                <span class="ellipsis-fallback">⋯</span>
+                                <span class="ellipsis-fallback">â‹¯</span>
                             </button>
                         </div>
                     </div>
@@ -345,7 +346,7 @@ function cardClickHandler(e) {
 
 // Initialize drag and drop for cards
 function initializeDragAndDrop() {
-    console.log('🔥 Initializing drag and drop');
+    console.log('ðŸ”¥ Initializing drag and drop');
     
     const cards = document.querySelectorAll('.card-item');
     console.log(`Found ${cards.length} cards to make draggable`);
@@ -363,7 +364,7 @@ function initializeDragAndDrop() {
         card.addEventListener('dragstart', handleDragStart);
         card.addEventListener('dragend', handleDragEnd);
         
-        console.log('✓ Card', card.dataset.cardId, 'is now draggable');
+        console.log('âœ“ Card', card.dataset.cardId, 'is now draggable');
     });
     
     // Setup drop zones on lists (using actual class name from HTML)
@@ -376,10 +377,10 @@ function initializeDragAndDrop() {
         listBody.addEventListener('dragleave', handleDragLeave);
         listBody.addEventListener('drop', handleDrop);
         
-        console.log('✓ Drop zone set up on:', listBody);
+        console.log('âœ“ Drop zone set up on:', listBody);
     });
     
-    console.log('✅ Drag and drop initialized successfully');
+    console.log('âœ… Drag and drop initialized successfully');
 }
 
 let draggedCard = null;
@@ -387,7 +388,7 @@ let sourceListId = null;
 
 // Handle drag start
 function handleDragStart(e) {
-    console.log('🚀 DRAG START EVENT FIRED!', {
+    console.log('ðŸš€ DRAG START EVENT FIRED!', {
         cardId: this.dataset.cardId,
         element: this
     });
@@ -401,7 +402,7 @@ function handleDragStart(e) {
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', this.dataset.cardId);
     
-    console.log('✅ Drag data set:', {
+    console.log('âœ… Drag data set:', {
         cardId: this.dataset.cardId,
         sourceListId: sourceListId
     });
@@ -417,14 +418,14 @@ function handleDragEnd(e) {
         list.classList.remove('drag-over');
     });
     
-    console.log('🏁 Drag ended');
+    console.log('ðŸ Drag ended');
     draggedCard = null;
     sourceListId = null;
 }
 
 // Handle drag over
 function handleDragOver(e) {
-    console.log('🔄 Drag over detected on:', this);
+    console.log('ðŸ”„ Drag over detected on:', this);
     if (e.preventDefault) {
         e.preventDefault(); // Allows drop
     }
@@ -434,13 +435,13 @@ function handleDragOver(e) {
 
 // Handle drag enter
 function handleDragEnter(e) {
-    console.log('➡️ Drag enter on:', this);
+    console.log('âž¡ï¸ Drag enter on:', this);
     this.classList.add('drag-over');
 }
 
 // Handle drag leave
 function handleDragLeave(e) {
-    console.log('⬅️ Drag leave from:', this);
+    console.log('â¬…ï¸ Drag leave from:', this);
     // Only remove if we're leaving the list, not a child element
     if (e.target === this) {
         this.classList.remove('drag-over');
@@ -449,7 +450,7 @@ function handleDragLeave(e) {
 
 // Handle drop
 async function handleDrop(e) {
-    console.log('🎯 DROP EVENT TRIGGERED on:', this);
+    console.log('ðŸŽ¯ DROP EVENT TRIGGERED on:', this);
     if (e.stopPropagation) {
         e.stopPropagation(); // Stops browser from redirecting
     }
@@ -466,7 +467,7 @@ async function handleDrop(e) {
     const targetListId = targetList.dataset.listId;
     const cardId = draggedCard.dataset.cardId;
     
-    console.log('📥 Drop:', {
+    console.log('ðŸ“¥ Drop:', {
         cardId: cardId,
         fromList: sourceListId,
         toList: targetListId
@@ -487,7 +488,7 @@ async function handleDrop(e) {
             });
             
             if (response.success) {
-                console.log('✅ Card moved to new list in database');
+                console.log('âœ… Card moved to new list in database');
                 // Refresh the board
                 await renderLists();
                 showNotification('Card moved successfully!', 'success');
@@ -497,7 +498,7 @@ async function handleDrop(e) {
             }
         } else if (window.db) {
             await window.db.update('cards', parseInt(cardId), { list_id: parseInt(targetListId) });
-            console.log('✅ Card moved to new list in local database');
+            console.log('âœ… Card moved to new list in local database');
             // Refresh the board
             await renderLists();
             showNotification('Card moved successfully!', 'success');
@@ -512,7 +513,7 @@ async function handleDrop(e) {
 
 // Reset board to have only To Do list with test cards
 function resetToDoOnlyBoard() {
-    console.log('🔄 Resetting board to To Do only...');
+    console.log('ðŸ”„ Resetting board to To Do only...');
     
     // Create test data structure
     const testBoard = {
@@ -563,13 +564,13 @@ function resetToDoOnlyBoard() {
         initializeDragAndDrop();
         initializeCardClicks();
         
-        console.log('✅ Test board created with draggable cards!');
+        console.log('âœ… Test board created with draggable cards!');
     }
 }
 
 // Debug function to test drag functionality
 function testDragFunctionality() {
-    console.log('🔍 Testing drag functionality...');
+    console.log('ðŸ” Testing drag functionality...');
     
     const cards = document.querySelectorAll('.card-item');
     console.log(`Found ${cards.length} cards`);
@@ -899,7 +900,7 @@ function displayCardAttachments(attachments) {
                 <div class="attachment-details">
                     <div class="attachment-name">${escapeHtml(attachment.filename)}</div>
                     <div class="attachment-meta">
-                        ${formatFileSize(attachment.file_size)} • Added ${formatDate(attachment.created_at)}
+                        ${formatFileSize(attachment.file_size)} â€¢ Added ${formatDate(attachment.created_at)}
                     </div>
                 </div>
             </div>
@@ -1794,10 +1795,10 @@ function performLabelFilter(searchTerm) {
             if (searchTerm === '' || labelText.includes(searchTerm)) {
                 item.style.display = 'flex';
                 visibleCount++;
-                console.log(`  → SHOWING: "${labelText}"`);
+                console.log(`  â†’ SHOWING: "${labelText}"`);
             } else {
                 item.style.display = 'none';
-                console.log(`  → HIDING: "${labelText}"`);
+                console.log(`  â†’ HIDING: "${labelText}"`);
             }
         } else {
             console.log(`Label ${index}: No label-name element found`);
@@ -3554,7 +3555,7 @@ function updateStatisticsModal(stats) {
             <div class="list-progress-header">
                 <div class="list-name">${escapeHtml(list.name)}</div>
                 <div class="list-stats">
-                    ${list.totalCards} cards • ${list.completionRate}% cards completed • (${list.completedCards}/${list.totalCards})
+                    ${list.totalCards} cards â€¢ ${list.completionRate}% cards completed â€¢ (${list.completedCards}/${list.totalCards})
                 </div>
             </div>
             <div class="list-progress-body">
